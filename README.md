@@ -2,6 +2,8 @@
 
 RTPolicy 正式运行代码：训练 / RobotWin 仿真评测 / ONNX 导出与推理 / TensorRT 编译测速。
 
+独立项目主页源码：[RTPolicy.project](https://github.com/D-Robotics-AI-Lab/RTPolicy.project)。当前为私有草稿，可按页面仓库说明在本地预览；主页与训练代码分开维护。
+
 Python 包名仍是 `drrm`；策略类/目录已全部改名 RTPolicy（原 VODPP/VODPPlus）。原论文仓库：[DRRM-VODPP](https://github.com/D-Robotics-AI-Lab/DRRM-VODPP)。
 
 **旧 checkpoint 兼容**：类名从 `VODPPlus*` 改成 `RTPolicy*` 后，存量 ckpt 的
