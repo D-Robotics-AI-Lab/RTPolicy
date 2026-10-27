@@ -16,7 +16,7 @@ from huggingface_hub.constants import (PYTORCH_WEIGHTS_NAME,
 from huggingface_hub.file_download import hf_hub_download
 from huggingface_hub.utils import EntryNotFoundError, is_torch_available
 
-from drrm.common.hub_mixin import CompatiblePyTorchModelHubMixin
+from rtpolicy.common.hub_mixin import CompatiblePyTorchModelHubMixin
 
 
 class BasePolicy(

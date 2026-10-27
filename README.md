@@ -5,7 +5,10 @@
 <img src="assets/rtpolicy-wordmark.svg" width="360" alt="RTPolicy">
 </picture>
 
-<h2>Real-Time (32.9 Hz) Multi-View Visuomotor Policy<br>for Robotic Manipulation on Edge Devices</h2>
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="assets/rtpolicy-paper-title-dark.svg">
+<img src="assets/rtpolicy-paper-title.svg" width="100%" alt="Real-Time (32.9 Hz) Multi-View Visuomotor Policy for Robotic Manipulation on Edge Devices">
+</picture>
 
 <p>
 <b>Xianbao Hou</b><sup>1,3,*</sup> · <b>Zehao Ni</b><sup>2,3,*</sup> · <b>Yonghao He</b><sup>4,†</sup> · <b>Lingfeng Qian</b><sup>3</sup><br>
@@ -24,12 +27,16 @@
 <p align="center">
 <a href="https://github.com/D-Robotics-AI-Lab/RTPolicy"><img src="assets/badge-code.svg" height="24" alt="Code: GitHub"></a>
 <a href="https://github.com/D-Robotics-AI-Lab/RTPolicy.project"><img src="assets/badge-project.svg" height="24" alt="Project page source"></a>
+<a href="https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/demo/RTPolicy.mp4"><img src="assets/badge-video.svg" height="24" alt="Watch the full RTPolicy demo"></a>
 <img src="assets/badge-paper.svg" height="24" alt="Paper: coming soon">
 <img src="assets/badge-models.svg" height="24" alt="Models: coming soon">
 <a href="LICENSE"><img src="assets/badge-license.svg" height="24" alt="License: see LICENSE"></a>
 </p>
 
-<img src="assets/teaser.webp" width="100%" alt="Real-world task sequences from the RTPolicy paper: drawer manipulation, stack and cover, and workpiece assembly">
+<a href="https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/demo/RTPolicy.mp4"><img src="assets/demo-preview.gif" width="100%" alt="Continuous eight-second Conveyor Picking preview from the RTPolicy demonstration video; click for the complete 2-minute-18-second MP4"></a>
+
+<p><a href="https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/demo/RTPolicy.mp4"><b>▶ Full RTPolicy demonstration · 2:18 · MP4</b></a></p>
+<p>The animation is a short continuous preview. The linked video is the complete original demonstration; playback speeds are annotated in the video.</p>
 
 **Multi-view perception. Compact visual tokens. Four-step action generation.**
 
@@ -43,7 +50,7 @@ edge devices, reaching **32.9 Hz on S600 in INT16** in the paper's latency evalu
 
 ## 🔥 Updates
 
-Release updates, paper links, demonstration videos, and model downloads will be added here.
+The [full RTPolicy demonstration video](https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/demo/RTPolicy.mp4) is available. Paper links and model downloads will be added when released.
 
 ## 1. Introduction
 
@@ -68,17 +75,21 @@ not required as policy inputs.
 
 ### 1.2 Repository Structure
 
-| Path                                                           | What to find                                                        |
-| -------------------------------------------------------------- | ------------------------------------------------------------------- |
-| [`drrm/models/policy/rtpolicy/`](drrm/models/policy/rtpolicy/) | Visual encoder, multi-view fusion, adapters, DiT, and policy runner |
-| [`drrm/datasets/`](drrm/datasets/)                             | Dataset readers and preprocessing interfaces                        |
-| [`drrm/trainer/`](drrm/trainer/)                               | Training and ONNX export                                            |
-| [`configs/`](configs/)                                         | Training, observation, robot, and export configurations             |
-| [`simulation/robotwin2.0/`](simulation/robotwin2.0/)           | RoboTwin2.0 environments and RTPolicy adapter                       |
-| [`scripts/`](scripts/) · [`tools/`](tools/)                    | Evaluation, inference, TensorRT tools, and dataset preparation      |
-| [`docs/`](docs/)                                               | [Runtime guide](docs/README.md)                                     |
+| Path                                                                   | What to find                                                        |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| [`rtpolicy/models/policy/rtpolicy/`](rtpolicy/models/policy/rtpolicy/) | Visual encoder, multi-view fusion, adapters, DiT, and policy runner |
+| [`rtpolicy/datasets/`](rtpolicy/datasets/)                             | Dataset readers and preprocessing interfaces                        |
+| [`rtpolicy/trainer/`](rtpolicy/trainer/)                               | Training and ONNX export                                            |
+| [`configs/`](configs/)                                                 | Training, observation, robot, and export configurations             |
+| [`simulation/robotwin2.0/`](simulation/robotwin2.0/)                   | RoboTwin2.0 environments and RTPolicy adapter                       |
+| [`scripts/`](scripts/) · [`tools/`](tools/)                            | Evaluation, inference, TensorRT tools, and dataset preparation      |
+| [`docs/`](docs/)                                                       | [Runtime guide](docs/README.md)                                     |
 
-The import package remains `drrm`; the policy classes are named `RTPolicy*`.
+The Python import package is `rtpolicy`; the policy classes are named `RTPolicy*`.
+
+Existing checkpoint metadata is remapped to the current package in memory when
+loading; the original configuration and weights are preserved. To persist updated
+metadata, run `tools/rename_ckpt_pkg_map.py` on a copied checkpoint directory.
 
 ## 2. Model Overview
 
@@ -112,6 +123,8 @@ for DP / VO-DP, and three views for π0.5 / RTPolicy.
 | VO-DP            |     84% |           34% |       4% |     40.7% |
 | π0.5             |     88% |           56% |      12% |     52.0% |
 | **RTPolicy**     | **92%** |       **94%** |  **30%** | **72.0%** |
+
+<p align="center"><img src="assets/teaser.webp" width="100%" alt="Physical experiment task sequences from the paper"></p>
 
 ### 2.3 Latency on GPU and Jetson
 
@@ -151,12 +164,12 @@ compiler estimates.
 
 ### 2.5 Model Downloads
 
-| Resource                        | Availability   |
-| ------------------------------- | -------------- |
-| Paper / arXiv                   | To be released |
-| Demonstration videos            | To be released |
-| Policy checkpoints              | To be released |
-| S600 / S100 deployment packages | To be released |
+| Resource                        | Availability                                                                                                          |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Paper / arXiv                   | To be released                                                                                                        |
+| Demonstration video             | [Full MP4 · 2:18](https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/demo/RTPolicy.mp4) |
+| Policy checkpoints              | To be released                                                                                                        |
+| S600 / S100 deployment packages | To be released                                                                                                        |
 
 ## 3. Getting Started
 
@@ -231,7 +244,7 @@ JPEG input alignment is enabled by default through `RTPOLICY_JPEG_ROUNDTRIP=1`.
 ### 4.3 Export and Run ONNX
 
 ```bash
-python -m drrm.trainer.onnx \
+python -m rtpolicy.trainer.onnx \
   --checkpoint-dir "$CHECKPOINT_DIR" \
   --onnx-path "$RTPOLICY_ARTIFACT_DIR/model.onnx" \
   --device cpu --export-dtype fp32 --image-preprocess-in-onnx --verify

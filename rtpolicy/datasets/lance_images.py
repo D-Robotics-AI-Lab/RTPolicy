@@ -4,7 +4,7 @@ import os
 
 import numpy as np
 
-from drrm.datasets.lance_video import MountedFilePool
+from rtpolicy.datasets.lance_video import MountedFilePool
 
 
 class MappedFilePool:

@@ -2,7 +2,7 @@
 train_dataset:
   task: null
   demo: null
-  _target_: drrm.datasets.builder.build_dataset
+  _target_: rtpolicy.datasets.builder.build_dataset
   backend: lerobot
   root: datasets/drrm_robotwin2.0_D435_Agilex_200_rgb
   repo_id: D-robotics/drrm_robotwin2.0_D435_Agilex_200_rgb

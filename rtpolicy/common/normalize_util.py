@@ -1,5 +1,5 @@
-from drrm.common.normalizer import SingleFieldLinearNormalizer
-from drrm.common.pytorch_util import dict_apply, dict_apply_reduce, dict_apply_split
+from rtpolicy.common.normalizer import SingleFieldLinearNormalizer
+from rtpolicy.common.pytorch_util import dict_apply, dict_apply_reduce, dict_apply_split
 import numpy as np
 
 

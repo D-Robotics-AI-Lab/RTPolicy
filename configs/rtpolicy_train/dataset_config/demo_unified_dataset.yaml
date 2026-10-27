@@ -3,7 +3,7 @@ train_dataset:
   task: null
   demo: null
   path: null
-  _target_: drrm.datasets.builder.build_dataset
+  _target_: rtpolicy.datasets.builder.build_dataset
   backend: lerobot
   root: ${train_dataset.path}
   repo_id: ${train_dataset.path}

@@ -4,8 +4,8 @@ import zarr
 import numpy as np
 import torch
 import torch.nn as nn
-from drrm.common.pytorch_util import dict_apply
-from drrm.common.dict_of_tensor_mixin import DictOfTensorMixin
+from rtpolicy.common.pytorch_util import dict_apply
+from rtpolicy.common.dict_of_tensor_mixin import DictOfTensorMixin
 
 
 class LinearNormalizer(DictOfTensorMixin):

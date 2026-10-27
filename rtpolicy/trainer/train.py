@@ -19,8 +19,9 @@ from diffusers.utils import is_wandb_available
 from tqdm.auto import tqdm
 from safetensors.torch import load_model
 
-from drrm.common.sampler import ResumableEpochSampler
-from drrm.common.ema_model import EMAModel
+from rtpolicy.common.sampler import ResumableEpochSampler
+from rtpolicy.common.ema_model import EMAModel
+from rtpolicy.common.checkpoint import canonical_class_path
 
 
 if is_wandb_available():
@@ -229,7 +230,7 @@ def build_validation_dataloader(args, val_dataset, accelerator=None):
 def training_batch_iterator(loader, device, cuda_prefetch=False):
     iterator = iter(loader)
     if cuda_prefetch:
-        from drrm.common.cuda_prefetch import CudaPrefetchIterator
+        from rtpolicy.common.cuda_prefetch import CudaPrefetchIterator
 
         return CudaPrefetchIterator(iterator, device)
     return iterator
@@ -353,8 +354,8 @@ def train(args, logger):
 
     # Policy Model creation
     model_args = OmegaConf.to_container(args.model)
-    pkg_config = model_args.pop('target_config')
-    pkg_policy = model_args.pop('target_policy')
+    pkg_config = canonical_class_path(model_args.pop('target_config'))
+    pkg_policy = canonical_class_path(model_args.pop('target_policy'))
     ConfigClass = hydra.utils.get_class(pkg_config)
     PolicyClass = hydra.utils.get_class(pkg_policy)
     model_args['pkg_map'] = {
@@ -378,7 +379,7 @@ def train(args, logger):
         max_value=args.ema.max_value,
     )
 
-    from drrm.common.vision_compile import compile_frozen_vision_backbone
+    from rtpolicy.common.vision_compile import compile_frozen_vision_backbone
 
     vision_compile = compile_frozen_vision_backbone(
         policy_model, enabled=getattr(args, "vision_backbone_compile", False),
@@ -494,7 +495,7 @@ def train(args, logger):
     if accelerator.is_main_process:
         # Convert omegaconf.DictConfig to primitive types so it doesn't get dumped as truncated JSON
         config_dict = OmegaConf.to_container(args, resolve=True)
-        accelerator.init_trackers("DRRM", config=config_dict)
+        accelerator.init_trackers("RTPolicy", config=config_dict)
 
     # Train!
     logger.info("***** Running training *****")
@@ -551,7 +552,7 @@ def train(args, logger):
             
             checkpoint_path = os.path.join(args.output_dir, path)
             global_step = int(path.split("-")[1])
-            from drrm.common.training_resume import restore_normalizer_devices, restore_training_ema
+            from rtpolicy.common.training_resume import restore_normalizer_devices, restore_training_ema
 
             resume_details = restore_training_ema(
                 ema_policy_model, ema_model, optimizer, checkpoint_path, global_step,

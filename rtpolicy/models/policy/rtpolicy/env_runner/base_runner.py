@@ -10,9 +10,9 @@ from datetime import datetime
 import importlib
 import dill
 from argparse import ArgumentParser
-from drrm.common.pytorch_util import dict_apply
-from drrm.models.base_policy import BasePolicy
-from drrm.models.base_runner import BaseRunner, load_policy
+from rtpolicy.common.pytorch_util import dict_apply
+from rtpolicy.models.base_policy import BasePolicy
+from rtpolicy.models.base_runner import BaseRunner, load_policy
 
 
 class RTPolicyRunner(BaseRunner):
@@ -130,7 +130,7 @@ class RTPolicyRunner(BaseRunner):
             obs_dict_input["state"] = obs_dict["state"].unsqueeze(0)
             obs_dict_input["endpose"] = obs_dict["endpose"].unsqueeze(0)
             if getattr(policy, "action_key", None) == "delta_state":
-                # Match DRRMDataset: the first condition is absolute state;
+                # Match RTPolicyDataset: the first condition is absolute state;
                 # later observation steps are relative to that first state.
                 delta_state = obs_dict["state"] - obs_dict["state"][0:1]
                 delta_state[0:1] = obs_dict["state"][0:1]

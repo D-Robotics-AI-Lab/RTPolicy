@@ -1,7 +1,7 @@
 # @package _global_
 # --------------------------- trainer config
 # trainer function
-_target_: drrm.trainer.train.train
+_target_: rtpolicy.trainer.train.train
 # Number of updates steps to accumulate before performing a backward/update pass.
 gradient_accumulation_steps: 1
 # Whether to use mixed precision. Choose between fp16 and bf16 (bfloat16). Bf16 requires PyTorch >= 1.10.and an Nvidia Ampere GPU.  
@@ -78,8 +78,8 @@ obs_image_frame_indices: ${eval:'ListConfig(list(range(${n_obs_steps}-${n_image_
 n_action_steps: ${eval:'${horizon}-${n_obs_steps}'}
 n_latency_steps: 0
 model:
-  target_config: drrm.models.RTPolicyDitFlowMatchingConfig
-  target_policy: drrm.models.RTPolicyDitFlowMatching
+  target_config: rtpolicy.models.RTPolicyDitFlowMatchingConfig
+  target_policy: rtpolicy.models.RTPolicyDitFlowMatching
   shape_meta: ${shape_meta}
   noise_scheduler:
     num_train_timesteps: 1000

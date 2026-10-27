@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import cv2
-from drrm.models.policy.rtpolicy.env_runner.base_runner import RTPolicyRunner
+from rtpolicy.models.policy.rtpolicy.env_runner.base_runner import RTPolicyRunner
 import yaml
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../.."))

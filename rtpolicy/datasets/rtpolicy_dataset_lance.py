@@ -1,4 +1,4 @@
-"""Lance-backend DRRMDataset (self-contained, no lerobot_lancedb dependency).
+"""Lance-backend RTPolicyDataset (self-contained, no lerobot_lancedb dependency).
 
 The lerobot backend pins lerobot 0.3.3 while lerobot_lancedb requires
 lerobot>=0.5, and the two cannot coexist in one environment -- so this module
@@ -25,14 +25,14 @@ import torch
 from torch.utils.data import Dataset
 from torchvision.io import ImageReadMode, decode_jpeg
 
-from drrm.common.normalizer import LinearNormalizer
-from drrm.common.normalize_util import (
+from rtpolicy.common.normalizer import LinearNormalizer
+from rtpolicy.common.normalize_util import (
     get_identity_normalizer_from_stat,
     get_range_normalizer_from_stat,
     robomimic_abs_action_only_dual_arm_normalizer_from_stat,
 )
 
-# Duplicated from drrm_dataset.py: that module imports lerobot 0.3.3 API at
+# Duplicated from rtpolicy_dataset.py: that module imports lerobot 0.3.3 API at
 # module level, so this module deliberately avoids importing lerobot and must
 # stay self-contained.
 DEFAULT_KEYS = {"timestamp", "frame_indx", "episode_index", "index", "task_index", "frame_index"}
@@ -199,7 +199,7 @@ class _LanceReader:
 
     def _open_blob_images(self):
         if self._blob_image_names:
-            from drrm.datasets.lance_images import BlobImageReader
+            from rtpolicy.datasets.lance_images import BlobImageReader
 
             self._blob_images = BlobImageReader(
                 self._lance_dataset, self._table_uri, self._blob_image_names, self._image_io_backend,
@@ -360,7 +360,7 @@ class _LanceVideoReader(_LanceReader):
         self._video_slices = None
         self._file_pool = None
         if video_io_backend in ("auto", "file"):
-            from drrm.datasets.lance_video import mounted_video_slices
+            from rtpolicy.datasets.lance_video import mounted_video_slices
 
             self._video_slices = mounted_video_slices(self._videos_dataset, self._videos_uri)
             if self._video_slices is None and video_io_backend == "file":
@@ -385,12 +385,12 @@ class _LanceVideoReader(_LanceReader):
                 cached_bytes += len(data)
 
     def _open_video_source(self, identity):
-        from drrm.datasets.lance_video import buffered_video_blob
+        from rtpolicy.datasets.lance_video import buffered_video_blob
 
         if identity in self._video_bytes_cache:
             return io.BytesIO(self._video_bytes_cache[identity])
         if self._video_slices is not None:
-            from drrm.datasets.lance_video import FileSlice, MountedFilePool
+            from rtpolicy.datasets.lance_video import FileSlice, MountedFilePool
 
             if self._file_pool is None:
                 self._file_pool = MountedFilePool(self._cache_size)
@@ -403,7 +403,7 @@ class _LanceVideoReader(_LanceReader):
         )
 
     def _new_decoder_cache(self):
-        from drrm.datasets.lance_video import VideoDecoderCache
+        from rtpolicy.datasets.lance_video import VideoDecoderCache
 
         return VideoDecoderCache(
             self._cache_size, self._tolerance_s, self._decode_device,
@@ -456,7 +456,7 @@ class _LanceVideoReader(_LanceReader):
             pool.close()
 
 
-class DRRMDataset(Dataset):
+class RTPolicyDataset(Dataset):
     def __init__(
         self,
         repo_id: str,

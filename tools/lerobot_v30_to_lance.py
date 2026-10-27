@@ -29,7 +29,7 @@ from PIL import Image
 
 # Also supports invocation from outside the repo without an editable install.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from drrm.datasets.lance_video import VideoDecoderCache
+from rtpolicy.datasets.lance_video import VideoDecoderCache
 
 
 SCALARS = {"episode_index", "frame_index", "index", "timestamp", "task_index", "subtask_index"}

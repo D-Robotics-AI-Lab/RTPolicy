@@ -24,12 +24,12 @@ nvidia-smi dmon -s puc -d 1 -o DT > gpu_sm.log
 数据路径：EFS → Lance 字节读取 → JPEG/视频解码 → CPU 预取 → H2D → 模型前反向 → AdamW/EMA → 多卡同步。
 这些阶段会重叠，逐阶段耗时不能简单相加；一个 rank 卡住，也可能让其余卡等待。
 
-| 现象 | 先检查什么 | 本轮做法 |
-|---|---|---|
-| 换 EFS 后变慢、SM 有低谷 | 读取字节数、慢 syscall、worker 队列 | 拆开读取/解码/H2D，不只看 DataLoader 总时间 |
-| 每隔约 30 秒停几秒 | 慢步骤时间与读取栈是否对齐 | 捕获到 EFS `preadv` 最长约 6.9 秒，随后 CPU 队列耗尽、多卡等待 |
-| 大多数步骤正常、P99 很差 | 长尾来源，而非盲目增加 worker | JPEG blob 显式按需 mmap，绕开本轮已观察到的读取停顿 |
-| 加载已很短，但训练仍慢 | GPU 热点、细小算子、CPU 发射、同步 | 编译冻结 backbone，再用固定输入判断加载剩余影响 |
+| 现象                     | 先检查什么                          | 本轮做法                                                       |
+| ------------------------ | ----------------------------------- | -------------------------------------------------------------- |
+| 换 EFS 后变慢、SM 有低谷 | 读取字节数、慢 syscall、worker 队列 | 拆开读取/解码/H2D，不只看 DataLoader 总时间                    |
+| 每隔约 30 秒停几秒       | 慢步骤时间与读取栈是否对齐          | 捕获到 EFS `preadv` 最长约 6.9 秒，随后 CPU 队列耗尽、多卡等待 |
+| 大多数步骤正常、P99 很差 | 长尾来源，而非盲目增加 worker       | JPEG blob 显式按需 mmap，绕开本轮已观察到的读取停顿            |
+| 加载已很短，但训练仍慢   | GPU 热点、细小算子、CPU 发射、同步  | 编译冻结 backbone，再用固定输入判断加载剩余影响                |
 
 观察到的是文件系统读取停顿；其内部为什么周期性触发，尚未用内核证据确认。视频/JPEG 快慢还取决于 codec、GOP、解码器缓存和读取放大，比较时必须对齐输入条件。
 
@@ -49,11 +49,11 @@ nvidia-smi dmon -s puc -d 1 -o DT > gpu_sm.log
 
 以下为合入前冻结实验快照的结果：2026-10-16，3路640×480、CNN Base、编译冻结 backbone、BF16；每组100步预热+1000步计时。平台配额标A800，实际节点为8×A100-SXM4-80GB：
 
-| 配置 | it/s | host步骤P99 | 步骤CV | SM均值 / 标准差 |
-|---|---:|---:|---:|---:|
-| 8卡 EFS mmap 正常读取 | 3.113 | 338.08ms | 1.84% | 96.79% / 2.16pp |
-| 8卡固定 GPU 输入 | 3.242 | 322.85ms | 1.33% | 96.39% / 1.51pp |
-| 单卡固定 GPU 输入 | 3.407 | 296.73ms | 0.43% | 96.78% / 1.10pp |
+| 配置                  |  it/s | host步骤P99 | 步骤CV | SM均值 / 标准差 |
+| --------------------- | ----: | ----------: | -----: | --------------: |
+| 8卡 EFS mmap 正常读取 | 3.113 |    338.08ms |  1.84% | 96.79% / 2.16pp |
+| 8卡固定 GPU 输入      | 3.242 |    322.85ms |  1.33% | 96.39% / 1.51pp |
+| 单卡固定 GPU 输入     | 3.407 |    296.73ms |  0.43% | 96.78% / 1.10pp |
 
 两组8卡全局batch256、首批全rank逐字节一致。去掉加载只快 **4.15%**，说明当前加载已跟上训练；差值包含解码、H2D、调度和资源竞争，不能全部当作EFS读盘时间。EFS组最长host步骤375ms，仍有偶发单卡SM低谷。SM标准差汇总各活动卡的1秒采样，包含卡间差异。
 
@@ -61,11 +61,11 @@ nvidia-smi dmon -s puc -d 1 -o DT > gpu_sm.log
 
 **2026-10-21：RTP同机补测640×480 Video（原AV1）与JPEG。**
 
-|配置|训练it/s|步骤P99|SM均值|SM标准差|
-|---|---:|---:|---:|---:|
-|Video未编译|2.2896|462.25ms|96.39%|3.64pp|
-|Video编译|2.7248|642.71ms|93.21%|7.36pp|
-|JPEG编译|3.1061|339.79ms|96.93%|2.15pp|
+| 配置        | 训练it/s |  步骤P99 | SM均值 | SM标准差 |
+| ----------- | -------: | -------: | -----: | -------: |
+| Video未编译 |   2.2896 | 462.25ms | 96.39% |   3.64pp |
+| Video编译   |   2.7248 | 642.71ms | 93.21% |   7.36pp |
+| JPEG编译    |   3.1061 | 339.79ms | 96.93% |   2.15pp |
 
 同一checkpoint20000、同模型/8×A100/global256/local32，各100步预热+1000步计时；Video编译比未编译快 **19.01%**，Video编译相对同轮JPEG编译的it/s差为 **-12.28%**。两种媒体都直接读EFS，预载预算0，无本地媒体copy；Video为PyAV CPU/file范围读取，JPEG为CPU/mmap。Video两组首批在8rank上逐字节一致。
 
@@ -90,7 +90,7 @@ torchrun --standalone --nproc_per_node=8 main.py \
 
 正式目录只保留训练功能；固定输入、Profiler、单测和测速脚本统一放在 [EFS实验归档](/data/efs/datasets/xianbao01.hou/rtpolicy_archives/20261016_071211/README.md)。要复现诊断，请使用归档中的诊断版代码快照，保持相同数据/模型/每卡batch，先正常加载，再关闭加载重复同一真实GPU batch；计时前后核对输入哈希，Profiler另跑，不将其开销混入速度。
 
-正式代码入口：`drrm/datasets/lance_images.py`（mmap）、`drrm/common/cuda_prefetch.py`（传输重叠）、`vision_compile.py`（编译）、`training_resume.py`（续训）；训练开关集中在 `drrm/trainer/train.py`。
+正式代码入口：`rtpolicy/datasets/lance_images.py`（mmap）、`rtpolicy/common/cuda_prefetch.py`（传输重叠）、`vision_compile.py`（编译）、`training_resume.py`（续训）；训练开关集中在 `rtpolicy/trainer/train.py`。
 
 后续优化应优先验证计算融合、AdamW/EMA批量更新、CPU发射和同步，仍然一次只改一项。Roofline 的约束是 `P ≤ min(P_peak, HBM带宽 × FLOPs/HBM字节)`；SM busy高不等于有效算力用满。本节点NCU报 `ERR_NVGPUCTRPERM`，没有真实HBM流量，尚不能宣布达到硬件Roofline；独立profiler中19.8%的kernel间隙也不能直接当作可提速比例。
 

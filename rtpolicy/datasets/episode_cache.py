@@ -72,7 +72,7 @@ class LocalEpisodeCacheBackend:
             episode_ids = episode_ids[:capacity]
         start_time = time.monotonic()
         print(
-            f"DRRMDataset episode RAM cache eager fill start: "
+            f"RTPolicyDataset episode RAM cache eager fill start: "
             f"episodes={len(episode_ids)}/{len(self.dataset.selected_episodes)}",
             flush=True,
         )
@@ -81,14 +81,14 @@ class LocalEpisodeCacheBackend:
             if self.report_interval and count % self.report_interval == 0:
                 elapsed = time.monotonic() - start_time
                 print(
-                    f"DRRMDataset episode RAM cache eager fill: {count}/{len(episode_ids)} episodes, "
+                    f"RTPolicyDataset episode RAM cache eager fill: {count}/{len(episode_ids)} episodes, "
                     f"elapsed={elapsed:.1f}s",
                     flush=True,
                 )
         bytes_estimate = sum(estimate_item_bytes(item) for item in self.cache.values())
         elapsed = time.monotonic() - start_time
         print(
-            f"DRRMDataset episode RAM cache eager fill done: "
+            f"RTPolicyDataset episode RAM cache eager fill done: "
             f"cached={len(self.cache)}/{len(self.dataset.selected_episodes)}, "
             f"estimated_size={bytes_estimate / 1024**3:.2f} GiB, "
             f"elapsed={elapsed:.1f}s",
@@ -147,7 +147,7 @@ class LocalEpisodeCacheBackend:
         self._reported_requests = requests
         stats = self.stats()
         print(
-            f"DRRMDataset episode RAM cache: size={stats['size']}, "
+            f"RTPolicyDataset episode RAM cache: size={stats['size']}, "
             f"hits={stats['hits']}, misses={stats['misses']}, "
             f"evictions={stats['evictions']}",
             flush=True,

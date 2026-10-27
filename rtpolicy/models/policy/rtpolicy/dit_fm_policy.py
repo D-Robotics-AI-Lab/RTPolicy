@@ -10,7 +10,7 @@ from diffusers.schedulers.scheduling_ddpm import DDPMScheduler
 from diffusers.schedulers.scheduling_dpmsolver_multistep import \
     DPMSolverMultistepScheduler
 
-from drrm.models.base_policy import BasePolicy
+from rtpolicy.models.base_policy import BasePolicy
 # from .module.obs_encoder import SceneEncoder as RTPolicyEncoder
 from .emvis.embodied_vision import VisualEncoder
 from .common.normalizer import LinearNormalizer

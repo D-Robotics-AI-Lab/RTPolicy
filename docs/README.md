@@ -38,10 +38,10 @@ python tools/lerobot_v30_to_lance.py \
   --mode jpeg --jpeg-storage blob --num-workers 8 --staging-dir /local/scratch
 ```
 
-| `--mode` | 输入的相机格式 | Lance 产物 |
-|---|---|---|
-| `video` | `dtype=video`，原始 MP4 | `<name>.lance` 数值帧表 + `<name>_videos.lance` 原始 MP4 blob 表 |
-| `jpeg`（默认） | `dtype=image`（内嵌或图片路径）或 `dtype=video` | `<name>.lance` 数值 + 逐帧 JPEG 表 |
+| `--mode`       | 输入的相机格式                                  | Lance 产物                                                       |
+| -------------- | ----------------------------------------------- | ---------------------------------------------------------------- |
+| `video`        | `dtype=video`，原始 MP4                         | `<name>.lance` 数值帧表 + `<name>_videos.lance` 原始 MP4 blob 表 |
+| `jpeg`（默认） | `dtype=image`（内嵌或图片路径）或 `dtype=video` | `<name>.lance` 数值 + 逐帧 JPEG 表                               |
 
 两种方式都输出 Lance 和完整 `meta/` 侧车；`jpeg` 指逐帧 JPEG 图像存储方式。
 JPEG 默认 quality=100、subsampling=0，可通过 `--jpeg-quality` 和
@@ -80,7 +80,7 @@ train_dataset.backend=lance train_dataset.dataset_metadata=null \
 train_dataset.root=/absolute/path/to/task_lance
 ```
 
-两个后端共用 `drrm.datasets.builder.build_dataset`。
+两个后端共用 `rtpolicy.datasets.builder.build_dataset`。
 Lance 自动识别逐帧表和 video 双表。也可用 `train_dataset.backend=lance_video`
 显式要求视频格式。两种格式在初始化时缓存数值列，批次只读取所需图像观测。
 video 按 metadata 的 `from_timestamp` 定位共享 MP4 中的帧；每个读取进程有独立

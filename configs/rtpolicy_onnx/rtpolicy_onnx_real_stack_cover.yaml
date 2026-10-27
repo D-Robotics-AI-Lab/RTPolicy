@@ -5,7 +5,7 @@ defaults:
   - _self_
 
 # --------------------------- ONNX export config (real_stack_cover_148, 4 FM steps)
-_target_: drrm.trainer.onnx.onnx
+_target_: rtpolicy.trainer.onnx.onnx
 
 # Export source checkpoint and output path. Override both at launch time.
 checkpoint_dir: null

@@ -3,8 +3,8 @@ from bisect import bisect_right
 
 import torch
 
-from drrm.datasets.episode_cache import LocalEpisodeCacheBackend
-from drrm.datasets.shm_episode_cache import ShmEpisodeCacheClient
+from rtpolicy.datasets.episode_cache import LocalEpisodeCacheBackend
+from rtpolicy.datasets.shm_episode_cache import ShmEpisodeCacheClient
 
 from lerobot.datasets.lerobot_dataset import LeRobotDataset
 from lerobot.datasets.lerobot_dataset import LeRobotDatasetMetadata
@@ -41,8 +41,8 @@ def hf_transform_parquet_images(items_dict):
             ]
     return items_dict
 
-from drrm.common.normalizer import LinearNormalizer
-from drrm.common.normalize_util import (
+from rtpolicy.common.normalizer import LinearNormalizer
+from rtpolicy.common.normalize_util import (
     detect_static_dims_from_episode_ranges,
     get_image_range_normalizer, 
     get_range_normalizer_from_stat, 
@@ -171,8 +171,8 @@ def compute_episode_stats(episode_data, features):
 
     return ep_stats
 
-class DRRMDataset(LeRobotDataset):
-    """Enhanced LeRobot dataset with DRRM-specific features"""
+class RTPolicyDataset(LeRobotDataset):
+    """Enhanced LeRobot dataset with RTPolicy-specific features"""
     
     DEFAULT_KEYS = {'timestamp', 'frame_indx', 'episode_index', 'index', 'task_index', 'frame_index'}
     FILTER_KEYS = {'timestamp', 'frame_indx', 'index'}
@@ -454,7 +454,7 @@ class DRRMDataset(LeRobotDataset):
 
         static_dims = np.flatnonzero(info['mask']).tolist()
         print(
-            "[DRRMDataset] static joint detection: "
+            "[RTPolicyDataset] static joint detection: "
             f"threshold={self.static_joint_ratio_threshold:g}, "
             f"num_train_episodes={info['num_episodes']}, "
             f"static_dims={static_dims}, "
@@ -502,7 +502,7 @@ class DRRMDataset(LeRobotDataset):
             rng = np.random.default_rng(self.seed)
             indices = rng.choice(n, size=sample_size, replace=False)
         print(
-            f"[DRRMDataset] _compute_delta_stats({key}): "
+            f"[RTPolicyDataset] _compute_delta_stats({key}): "
             f"sample_size={sample_size}/{n} (num_samples={num_samples})"
         )
         

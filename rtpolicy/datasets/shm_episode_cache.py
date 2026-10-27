@@ -16,7 +16,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from drrm.datasets.episode_cache import estimate_item_bytes, register_omegaconf_resolvers
+from rtpolicy.datasets.episode_cache import estimate_item_bytes, register_omegaconf_resolvers
 
 
 def _memfd_create(name):
@@ -269,7 +269,7 @@ class ShmEpisodeCacheBuilder:
         if total_nbytes <= 0:
             raise ValueError("Shared memory episode cache has no cacheable columns")
 
-        fd = _memfd_create("drrm_shm_episode_cache")
+        fd = _memfd_create("rtpolicy_shm_episode_cache")
         try:
             os.ftruncate(fd, total_nbytes)
             mm = mmap.mmap(fd, total_nbytes, access=mmap.ACCESS_WRITE)
@@ -477,7 +477,7 @@ class ShmEpisodeCacheServer:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Run a shared-memory DRRM episode cache server.")
+    parser = argparse.ArgumentParser(description="Run a shared-memory RTPolicy episode cache server.")
     parser.add_argument("--config-path", required=True)
     parser.add_argument("--config-name", required=True)
     parser.add_argument("--socket", required=True)

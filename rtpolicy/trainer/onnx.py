@@ -15,7 +15,8 @@ from safetensors import safe_open
 from safetensors.torch import load_model
 from transformers import AutoConfig
 
-from drrm.models.base_runner import load_policy
+from rtpolicy.models.base_runner import load_policy
+from rtpolicy.common.checkpoint import load_checkpoint_config, normalize_checkpoint_metadata
 
 
 _ORIGINAL_INTERPOLATE = F.interpolate
@@ -83,9 +84,9 @@ def _patch_torchvision_resize_for_onnx() -> None:
 
 def _patch_position_getters_for_onnx() -> None:
     module_names = [
-        "drrm.models.policy.rtpolicy.emvis.encoder.dinov3cnn_encoder",
-        "drrm.models.policy.rtpolicy.emvis.encoder.dinov3_encoder",
-        "drrm.models.policy.rtpolicy.emvis.encoder.da3_encoder",
+        "rtpolicy.models.policy.rtpolicy.emvis.encoder.dinov3cnn_encoder",
+        "rtpolicy.models.policy.rtpolicy.emvis.encoder.dinov3_encoder",
+        "rtpolicy.models.policy.rtpolicy.emvis.encoder.da3_encoder",
     ]
 
     def _position_getter_call(self, batch_size: int, height: int, width: int, device: torch.device):
@@ -129,7 +130,7 @@ def _patch_torch_onnx_scope_attributes() -> None:
     except ImportError:
         return
 
-    if getattr(onnx_utils, "_drrm_scope_attr_filter_patched", False):
+    if getattr(onnx_utils, "_rtpolicy_scope_attr_filter_patched", False):
         return
 
     _ORIGINAL_TORCH_ONNX_GET_MODULE_ATTRIBUTES = onnx_utils._get_module_attributes
@@ -143,13 +144,13 @@ def _patch_torch_onnx_scope_attributes() -> None:
         }
 
     onnx_utils._get_module_attributes = _get_module_attributes_onnx_safe
-    onnx_utils._drrm_scope_attr_filter_patched = True
+    onnx_utils._rtpolicy_scope_attr_filter_patched = True
 
 
 def _patch_dinov3_encoders_for_onnx() -> None:
     try:
         dinov3cnn_module = importlib.import_module(
-            "drrm.models.policy.rtpolicy.emvis.encoder.dinov3cnn_encoder"
+            "rtpolicy.models.policy.rtpolicy.emvis.encoder.dinov3cnn_encoder"
         )
     except ImportError:
         dinov3cnn_module = None
@@ -184,7 +185,7 @@ def _patch_dinov3_encoders_for_onnx() -> None:
 
     try:
         dinov3_module = importlib.import_module(
-            "drrm.models.policy.rtpolicy.emvis.encoder.dinov3_encoder"
+            "rtpolicy.models.policy.rtpolicy.emvis.encoder.dinov3_encoder"
         )
     except ImportError:
         dinov3_module = None
@@ -230,7 +231,7 @@ def _patch_adaptive_pool2d_modules_for_onnx(module: torch.nn.Module) -> None:
 
 def _patch_adapter_for_onnx() -> None:
     try:
-        from drrm.models.policy.rtpolicy.emvis import adapter as adapter_module
+        from rtpolicy.models.policy.rtpolicy.emvis import adapter as adapter_module
     except ImportError:
         return
 
@@ -351,9 +352,7 @@ def _repo_root() -> str:
 
 
 def _load_checkpoint_config_dict(checkpoint_dir: str) -> Dict[str, Any]:
-    config_path = os.path.join(checkpoint_dir, "config.json")
-    with open(config_path, "r", encoding="utf-8") as f:
-        return json.load(f)
+    return load_checkpoint_config(checkpoint_dir)
 
 
 def _get_checkpoint_emvis_config(config_dict: Dict[str, Any]) -> Dict[str, Any]:
@@ -889,6 +888,7 @@ def _load_policy_from_config_dict(
     checkpoint_dir: str,
     device: str,
 ):
+    config_dict = normalize_checkpoint_metadata(config_dict)
     config_cls = hydra.utils.get_class(config_dict["pkg_map"]["AutoConfig"])
     policy_cls = hydra.utils.get_class(config_dict["pkg_map"]["AutoModel"])
 
