@@ -27,7 +27,7 @@
 <p align="center">
 <a href="https://github.com/D-Robotics-AI-Lab/RTPolicy"><img src="assets/badge-code.svg" height="24" alt="Code: GitHub"></a>
 <a href="https://github.com/D-Robotics-AI-Lab/RTPolicy.project"><img src="assets/badge-project.svg" height="24" alt="Project page source"></a>
-<a href="https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/demo/RTPolicy.mp4"><img src="assets/badge-video.svg" height="24" alt="Watch the full RTPolicy demo"></a>
+<a href="https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/demo/RTPolicy.mp4"><img src="assets/badge-video.svg" height="24" alt="Download the full RTPolicy demo"></a>
 <img src="assets/badge-paper.svg" height="24" alt="Paper: coming soon">
 <img src="assets/badge-models.svg" height="24" alt="Models: coming soon">
 <a href="LICENSE"><img src="assets/badge-license.svg" height="24" alt="License: see LICENSE"></a>
@@ -35,7 +35,7 @@
 
 <a href="https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/demo/RTPolicy.mp4"><img src="assets/demo-preview.gif" width="100%" alt="Continuous eight-second Conveyor Picking preview from the RTPolicy demonstration video; click for the complete 2-minute-18-second MP4"></a>
 
-<p><a href="https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/demo/RTPolicy.mp4"><b>▶ Full RTPolicy demonstration · 2:18 · MP4</b></a></p>
+<p><a href="https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/demo/RTPolicy.mp4"><b>↓ Download full demonstration · 2:18 · MP4</b></a></p>
 <p>The animation is a short continuous preview. The linked video is the complete original demonstration; playback speeds are annotated in the video.</p>
 
 **Multi-view perception. Compact visual tokens. Four-step action generation.**
@@ -167,7 +167,7 @@ compiler estimates.
 | Resource                        | Availability                                                                                                          |
 | ------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | Paper / arXiv                   | To be released                                                                                                        |
-| Demonstration video             | [Full MP4 · 2:18](https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/demo/RTPolicy.mp4) |
+| Demonstration video             | [Download MP4 · 2:18](https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/demo/RTPolicy.mp4) |
 | Policy checkpoints              | To be released                                                                                                        |
 | S600 / S100 deployment packages | To be released                                                                                                        |
 
