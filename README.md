@@ -68,15 +68,15 @@ not required as policy inputs.
 
 ### 1.2 Repository Structure
 
-| Path                                                           | What to find                                                                                        |
-| -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| [`drrm/models/policy/rtpolicy/`](drrm/models/policy/rtpolicy/) | Visual encoder, multi-view fusion, adapters, DiT, and policy runner                                 |
-| [`drrm/datasets/`](drrm/datasets/)                             | LeRobot and Lance backends                                                                          |
-| [`drrm/trainer/`](drrm/trainer/)                               | Training and ONNX export                                                                            |
-| [`configs/`](configs/)                                         | Training, observation, robot, and export configurations                                             |
-| [`simulation/robotwin2.0/`](simulation/robotwin2.0/)           | RoboTwin2.0 environments and RTPolicy adapter                                                       |
-| [`scripts/`](scripts/) · [`tools/`](tools/)                    | Evaluation, inference, TensorRT tools, and dataset preparation                                      |
-| [`docs/`](docs/)                                               | [Runtime guide](docs/README.md) and [training optimization notes](docs/performance_optimization.md) |
+| Path                                                           | What to find                                                        |
+| -------------------------------------------------------------- | ------------------------------------------------------------------- |
+| [`drrm/models/policy/rtpolicy/`](drrm/models/policy/rtpolicy/) | Visual encoder, multi-view fusion, adapters, DiT, and policy runner |
+| [`drrm/datasets/`](drrm/datasets/)                             | Dataset readers and preprocessing interfaces                        |
+| [`drrm/trainer/`](drrm/trainer/)                               | Training and ONNX export                                            |
+| [`configs/`](configs/)                                         | Training, observation, robot, and export configurations             |
+| [`simulation/robotwin2.0/`](simulation/robotwin2.0/)           | RoboTwin2.0 environments and RTPolicy adapter                       |
+| [`scripts/`](scripts/) · [`tools/`](tools/)                    | Evaluation, inference, TensorRT tools, and dataset preparation      |
+| [`docs/`](docs/)                                               | [Runtime guide](docs/README.md)                                     |
 
 The import package remains `drrm`; the policy classes are named `RTPolicy*`.
 
@@ -106,12 +106,12 @@ GPU evaluation uses an RTX 4090, 200 demonstrations per task, 150K training step
 and 50 trials per task. Each method uses its native camera configuration: one view
 for DP / VO-DP, and three views for π0.5 / RTPolicy.
 
-| Method           |  Drawer | Stack & cover | Assembly |      Mean |
-| ---------------- | ------: | ------------: | -------: | --------: |
-| Diffusion Policy |     80% |            8% |       0% |     29.3% |
-| VO-DP            |     84% |           34% |       4% |     40.7% |
-| π0.5             |     88% |           56% |      12% |     52.0% |
-| **RTPolicy**     | **92%** |       **94%** |  **30%** | **72.0%** |
+| Method                                    |  Drawer | Stack & cover | Assembly |      Mean |
+| ----------------------------------------- | ------: | ------------: | -------: | --------: |
+| Diffusion Policy                          |     80% |            8% |       0% |     29.3% |
+| [VO-DP](https://arxiv.org/abs/2510.15530) |     84% |           34% |       4% |     40.7% |
+| π0.5                                      |     88% |           56% |      12% |     52.0% |
+| **RTPolicy**                              | **92%** |       **94%** |  **30%** | **72.0%** |
 
 ### 2.3 Latency on GPU and Jetson
 
@@ -122,7 +122,7 @@ for DP / VO-DP, and three views for π0.5 / RTPolicy.
 | Jetson Orin NX 16GB | FP32      | 266.30 ms |    3.8 Hz |
 | Jetson Orin NX 16GB | FP16      | 143.20 ms |    7.0 Hz |
 
-Measurements are from Table VII. Precision labels follow that table.
+Values are reported in Table VII. Precision labels follow that table.
 
 ### 2.4 Latency on S600 and S100
 
@@ -135,6 +135,31 @@ Measurements are from Table VII. Precision labels follow that table.
 
 Batch-1 policy latency includes visual encoding and action generation; it is not
 full camera-to-actuation latency.
+
+#### Archived quantization / compiler reports
+
+The original HBDK performance reports below document the earlier ar5s1 four-core
+compilation (September 2026, target `nash-p`, HBDK 4.9.6).
+
+<p align="center">
+<a href="assets/quantization-int8-overview.webp"><img src="assets/quantization-int8-overview.webp" width="49%" alt="Original INT8 HBDK compiler report overview"></a>
+<a href="assets/quantization-int16-overview.webp"><img src="assets/quantization-int16-overview.webp" width="49%" alt="Original INT16 HBDK compiler report overview"></a>
+</p>
+
+Overview screenshots; the original interactive HTML files are linked below.
+
+| Precision       | Original interactive report                                                                                                                     |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| INT8 · 4 cores  | [Download HTML · 23.8 MB](https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/quantization/ar5s1-int8-4core.html)  |
+| INT16 · 4 cores | [Download HTML · 39.8 MB](https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/quantization/ar5s1-int16-4core.html) |
+
+Open a downloaded HTML file in a browser to inspect it. The files are self-contained.
+They provide **per-core estimates and compiler scheduling analysis**; their global
+summary contains no whole-model board measurement. This earlier 148-demo / 100K-step
+archive refers to `calib_1sample` and contains no post-quantization task-success test.
+The paper-reported latency and GPU success-rate tables above have separate protocols.
+The original reports are hosted once in the project-page repository to keep this
+runtime repository compact.
 
 ### 2.5 Model Downloads
 
@@ -155,7 +180,7 @@ environment uses PyTorch 2.7.1, torchvision 0.22.1, LeRobot 0.3.3, and transform
 ```bash
 git clone https://github.com/D-Robotics-AI-Lab/RTPolicy.git
 cd RTPolicy
-python -m pip install -e '.[lance]'
+python -m pip install -e .
 ```
 
 For an existing compatible environment, append `--no-deps` to the editable install.
@@ -168,7 +193,8 @@ Supply compatible DINOv3 weights and set
 checkpoints, simulator assets, and generated outputs are kept outside Git.
 
 The [runtime guide](docs/README.md) covers RobotWin-format data preparation,
-LeRobot v3 → Lance conversion, JPEG/video storage, and checkpoint compatibility.
+dataset conversion and checkpoint compatibility. LeRobot is the default data
+format; Lance storage is optional.
 For RoboTwin2.0 simulation, prepare SAPIEN, Vulkan, cuRobo, and the official assets:
 
 ```bash
@@ -200,8 +226,7 @@ WANDB_MODE=disabled accelerate launch --config_file configs/accelerate_config.ya
 ```
 
 The supplied Accelerate configuration targets eight GPUs; adjust it for your machine.
-Lance backends and optional training optimizations are documented in
-[docs/README.md](docs/README.md) and [docs/performance_optimization.md](docs/performance_optimization.md).
+See the [runtime guide](docs/README.md) for dataset preparation and configuration details.
 
 ### 4.2 Evaluate in RoboTwin2.0
 
@@ -249,15 +274,28 @@ S600 / S100 toolchain instructions and deployment packages will be added separat
 
 ## Acknowledgements
 
-RTPolicy builds on [PyTorch](https://pytorch.org/),
-[Transformers](https://github.com/huggingface/transformers),
-[DINOv3](https://github.com/facebookresearch/dinov3),
-[LeRobot](https://github.com/huggingface/lerobot), and RoboTwin2.0.
-We thank the authors and maintainers of these projects.
+We thank the authors of [DINOv3](https://github.com/facebookresearch/dinov3)
+and [VO-DP](https://github.com/D-Robotics-AI-Lab/DRRM) for sharing their research and code.
 
 ## Citation
 
-BibTeX and publication details will be added with the paper release.
+RTPolicy BibTeX and publication details will be added with the paper release.
+
+### Related work: VO-DP
+
+[VO-DP: Semantic-Geometric Adaptive Diffusion Policy for Vision-Only Robotic Manipulation](https://arxiv.org/abs/2510.15530)
+
+Zehao Ni et al., 2025. [Code](https://github.com/D-Robotics-AI-Lab/DRRM) · [Project](https://d-robotics-ai-lab.github.io/vodp/)
+
+```bibtex
+@article{ni2025vodp,
+  title={{VO-DP}: Semantic-Geometric Adaptive Diffusion Policy for Vision-Only Robotic Manipulation},
+  author={Ni, Zehao and He, Yonghao and Qian, Lingfeng and Mao, Jilei and Fu, Fa and Sui, Wei and Su, Hu and Peng, Junran and Wang, Zhipeng and He, Bin},
+  journal={arXiv preprint arXiv:2510.15530},
+  year={2025},
+  url={https://arxiv.org/abs/2510.15530}
+}
+```
 
 ## License
 
