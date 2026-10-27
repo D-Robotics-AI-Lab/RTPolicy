@@ -136,30 +136,15 @@ Values are reported in Table VII. Precision labels follow that table.
 Batch-1 policy latency includes visual encoding and action generation; it is not
 full camera-to-actuation latency.
 
-#### Archived quantization / compiler reports
+#### Quantization HTML Reports
 
-The original HBDK performance reports below document the earlier ar5s1 four-core
-compilation (September 2026, target `nash-p`, HBDK 4.9.6).
+| Device                  | Precision | Original HTML file                                                                                                   |
+| ----------------------- | --------- | -------------------------------------------------------------------------------------------------------------------- |
+| S600 · nash-p · 4 cores | INT16     | [S600.html](https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/quantization/s600.html) |
+| S100 · nash-e · 1 core  | INT16     | [S100.html](https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/quantization/s100.html) |
 
-<p align="center">
-<a href="assets/quantization-int8-overview.webp"><img src="assets/quantization-int8-overview.webp" width="49%" alt="Original INT8 HBDK compiler report overview"></a>
-<a href="assets/quantization-int16-overview.webp"><img src="assets/quantization-int16-overview.webp" width="49%" alt="Original INT16 HBDK compiler report overview"></a>
-</p>
-
-Overview screenshots; the original interactive HTML files are linked below.
-
-| Precision       | Original interactive report                                                                                                                     |
-| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| INT8 · 4 cores  | [Download HTML · 23.8 MB](https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/quantization/ar5s1-int8-4core.html)  |
-| INT16 · 4 cores | [Download HTML · 39.8 MB](https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/quantization/ar5s1-int16-4core.html) |
-
-Open a downloaded HTML file in a browser to inspect it. The files are self-contained.
-They provide **per-core estimates and compiler scheduling analysis**; their global
-summary contains no whole-model board measurement. This earlier 148-demo / 100K-step
-archive refers to `calib_1sample` and contains no post-quantization task-success test.
-The paper-reported latency and GPU success-rate tables above have separate protocols.
-The original reports are hosted once in the project-page repository to keep this
-runtime repository compact.
+Download the complete self-contained file and open it in a browser. These are
+original HBDK compiler reports; their performance entries are compiler estimates.
 
 ### 2.5 Model Downloads
 
