@@ -106,12 +106,12 @@ GPU evaluation uses an RTX 4090, 200 demonstrations per task, 150K training step
 and 50 trials per task. Each method uses its native camera configuration: one view
 for DP / VO-DP, and three views for π0.5 / RTPolicy.
 
-| Method                                    |  Drawer | Stack & cover | Assembly |      Mean |
-| ----------------------------------------- | ------: | ------------: | -------: | --------: |
-| Diffusion Policy                          |     80% |            8% |       0% |     29.3% |
-| [VO-DP](https://arxiv.org/abs/2510.15530) |     84% |           34% |       4% |     40.7% |
-| π0.5                                      |     88% |           56% |      12% |     52.0% |
-| **RTPolicy**                              | **92%** |       **94%** |  **30%** | **72.0%** |
+| Method           |  Drawer | Stack & cover | Assembly |      Mean |
+| ---------------- | ------: | ------------: | -------: | --------: |
+| Diffusion Policy |     80% |            8% |       0% |     29.3% |
+| VO-DP            |     84% |           34% |       4% |     40.7% |
+| π0.5             |     88% |           56% |      12% |     52.0% |
+| **RTPolicy**     | **92%** |       **94%** |  **30%** | **72.0%** |
 
 ### 2.3 Latency on GPU and Jetson
 
@@ -138,13 +138,16 @@ full camera-to-actuation latency.
 
 #### Quantization HTML Reports
 
-| Device                  | Precision | Original HTML file                                                                                                   |
-| ----------------------- | --------- | -------------------------------------------------------------------------------------------------------------------- |
-| S600 · nash-p · 4 cores | INT16     | [S600.html](https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/quantization/s600.html) |
-| S100 · nash-e · 1 core  | INT16     | [S100.html](https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/quantization/s100.html) |
+| Device                  | Precision | Original HTML file                                                                                                            |
+| ----------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| S600 · nash-p · 4 cores | INT16     | [Download S600 HTML](https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/quantization/s600.html) |
+| S100 · nash-e · 1 core  | INT16     | [Download S100 HTML](https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/quantization/s100.html) |
 
-Download the complete self-contained file and open it in a browser. These are
-original HBDK compiler reports; their performance entries are compiler estimates.
+Save the downloaded file with its `.html` extension, then open it in Chrome or
+Edge. GitHub's file/Raw views show or download source; they are not hosted report
+pages. For HTTP viewing, follow the [project-page preview instructions](https://github.com/D-Robotics-AI-Lab/RTPolicy.project#view-the-reports-as-webpages).
+These are original self-contained HBDK reports; their performance entries are
+compiler estimates.
 
 ### 2.5 Model Downloads
 
@@ -265,22 +268,6 @@ and [VO-DP](https://github.com/D-Robotics-AI-Lab/DRRM) for sharing their researc
 ## Citation
 
 RTPolicy BibTeX and publication details will be added with the paper release.
-
-### Related work: VO-DP
-
-[VO-DP: Semantic-Geometric Adaptive Diffusion Policy for Vision-Only Robotic Manipulation](https://arxiv.org/abs/2510.15530)
-
-Zehao Ni et al., 2025. [Code](https://github.com/D-Robotics-AI-Lab/DRRM) · [Project](https://d-robotics-ai-lab.github.io/vodp/)
-
-```bibtex
-@article{ni2025vodp,
-  title={{VO-DP}: Semantic-Geometric Adaptive Diffusion Policy for Vision-Only Robotic Manipulation},
-  author={Ni, Zehao and He, Yonghao and Qian, Lingfeng and Mao, Jilei and Fu, Fa and Sui, Wei and Su, Hu and Peng, Junran and Wang, Zhipeng and He, Bin},
-  journal={arXiv preprint arXiv:2510.15530},
-  year={2025},
-  url={https://arxiv.org/abs/2510.15530}
-}
-```
 
 ## License
 
