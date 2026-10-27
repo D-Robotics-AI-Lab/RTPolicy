@@ -1,100 +1,265 @@
-# RTPolicy
+<div align="center">
 
-RTPolicy 正式运行代码：训练 / RobotWin 仿真评测 / ONNX 导出与推理 / TensorRT 编译测速。
+<picture>
+<source media="(prefers-color-scheme: dark)" srcset="assets/rtpolicy-wordmark-dark.svg">
+<img src="assets/rtpolicy-wordmark.svg" width="360" alt="RTPolicy">
+</picture>
 
-独立项目主页源码：[RTPolicy.project](https://github.com/D-Robotics-AI-Lab/RTPolicy.project)。当前为私有草稿，可按页面仓库说明在本地预览；主页与训练代码分开维护。
+<h2>Real-Time (32.9 Hz) Multi-View Visuomotor Policy<br>for Robotic Manipulation on Edge Devices</h2>
 
-Python 包名仍是 `drrm`；策略类/目录已全部改名 RTPolicy（原 VODPP/VODPPlus）。原论文仓库：[DRRM-VODPP](https://github.com/D-Robotics-AI-Lab/DRRM-VODPP)。
+<p>
+<b>Xianbao Hou</b><sup>1,3,*</sup> · <b>Zehao Ni</b><sup>2,3,*</sup> · <b>Yonghao He</b><sup>4,†</sup> · <b>Lingfeng Qian</b><sup>3</sup><br>
+<b>Xin Shi</b><sup>3</sup> · <b>Hu Su</b><sup>5</sup> · <b>Wei Sui</b><sup>3,✉</sup> · <b>Cong Yang</b><sup>1,✉</sup>
+</p>
 
-**旧 checkpoint 兼容**：类名从 `VODPPlus*` 改成 `RTPolicy*` 后，存量 ckpt 的
-`config.json`（pkg_map/auto_map）需要跑一次
-`python tools/rename_ckpt_pkg_map.py --root <ckpt父目录>`（只改 config 字符串，不动权重）。
+<p>
+<sup>1</sup>School of Future Science and Engineering, Soochow University<br>
+<sup>2</sup>Shanghai Research Institute for Intelligent Autonomous Systems, Tongji University<br>
+<sup>3</sup>D-Robotics &nbsp; <sup>4</sup>Intime AI<br>
+<sup>5</sup>State Key Laboratory of Multimodal Artificial Intelligence Systems,<br>Institute of Automation, Chinese Academy of Sciences
+</p>
 
-## 目录
+<p><sup>*</sup>Equal contribution &nbsp; <sup>†</sup>Project lead &nbsp; <sup>✉</sup>Corresponding authors</p>
 
-| 路径 | 做什么 |
-|---|---|
-| `drrm/` | 策略、数据集、训练、ONNX 导出（`drrm.trainer.onnx`） |
-| `configs/` | 训练 yaml + `configs/rtpolicy_onnx/` |
-| `simulation/robotwin2.0/` | RobotWin 2.0 仿真与 `policy/RTPolicy/`（方法适配层仅保留 RTPolicy） |
-| `scripts/eval/` | 仿真评测入口 |
-| `scripts/infer_onnx.py` `scripts/infer_rtpolicy.py` | ONNX Runtime 推理 |
-| `scripts/build_bench_x86.py` `scripts/bench_acc_jetson.py` | TensorRT 建引擎 + 测速 |
-| `scripts/fp16_convert.py` `scripts/int8_convert.py` | ONNX 图精度转换 |
-| `docs/` | 正式使用说明及性能优化笔记 |
-| `pretrained/` | 软链到 EFS 上的 DINOv3 / VGGT 权重 |
+<p align="center">
+<a href="https://github.com/D-Robotics-AI-Lab/RTPolicy"><img src="assets/badge-code.svg" height="24" alt="Code: GitHub"></a>
+<a href="https://github.com/D-Robotics-AI-Lab/RTPolicy.project"><img src="assets/badge-project.svg" height="24" alt="Project page source"></a>
+<img src="assets/badge-paper.svg" height="24" alt="Paper: coming soon">
+<img src="assets/badge-models.svg" height="24" alt="Models: coming soon">
+<a href="LICENSE"><img src="assets/badge-license.svg" height="24" alt="License: see LICENSE"></a>
+</p>
 
-仿真物体网格 **没有拷进来**（太大），沿用原仓库的软链：
+<img src="assets/teaser.webp" width="100%" alt="Real-world task sequences from the RTPolicy paper: drawer manipulation, stack and cover, and workpiece assembly">
 
-- `simulation/robotwin2.0/assets/objects` → `/data/efs/users/ruilin.wang/RoboTwinAssets/objects`
-- `simulation/robotwin2.0/assets/background_texture` → 同目录 `background_texture`
+**Multi-view perception. Compact visual tokens. Four-step action generation.**
 
-本机 embodiment（aloha-agilex / piper / …）已拷进来。缺 objects 时再跑一次 `simulation/robotwin2.0/script/_download_assets.sh`。
+</div>
 
-## 安装
+RTPolicy turns multiple RGB views and robot state into action chunks with a compact
+flow-matching policy. It combines multi-view reasoning with a deployment path for
+edge devices, reaching **32.9 Hz on S600 in INT16** in the paper's latency evaluation.
+
+[Introduction](#1-introduction) · [Model overview](#2-model-overview) · [Getting started](#3-getting-started) · [Training and deployment](#4-training-export-and-inference)
+
+## 🔥 Updates
+
+Release updates, paper links, demonstration videos, and model downloads will be added here.
+
+## 1. Introduction
+
+### 1.1 Brief Introduction of RTPolicy
+
+<div align="center">
+<img src="assets/architecture.webp" width="100%" alt="RTPolicy architecture: frozen DINOv3 ConvNeXt, view-aware feature fusion, visual compression, and a flow-matching DiT conditioned on robot state">
+</div>
+
+RTPolicy fuses dense visual features across cameras before compressing them, retaining
+cross-view information in a small representation for the action model.
+
+- **Reason across views.** A frozen DINOv3 ConvNeXt backbone and view-aware feature fusion
+  combine complementary observations from three RGB cameras.
+- **Compress before action generation.** At 480 × 640 inputs, visual compression reduces
+  **900 visual tokens to 12**, giving the DiT a compact observation representation.
+- **Generate action chunks in four steps.** A flow-matching DiT conditions on the visual
+  representation and robot state to predict actions with four integration steps.
+
+The policy uses RGB images and robot state; language instructions and point clouds are
+not required as policy inputs.
+
+### 1.2 Repository Structure
+
+| Path                                                           | What to find                                                                                        |
+| -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| [`drrm/models/policy/rtpolicy/`](drrm/models/policy/rtpolicy/) | Visual encoder, multi-view fusion, adapters, DiT, and policy runner                                 |
+| [`drrm/datasets/`](drrm/datasets/)                             | LeRobot and Lance backends                                                                          |
+| [`drrm/trainer/`](drrm/trainer/)                               | Training and ONNX export                                                                            |
+| [`configs/`](configs/)                                         | Training, observation, robot, and export configurations                                             |
+| [`simulation/robotwin2.0/`](simulation/robotwin2.0/)           | RoboTwin2.0 environments and RTPolicy adapter                                                       |
+| [`scripts/`](scripts/) · [`tools/`](tools/)                    | Evaluation, inference, TensorRT tools, and dataset preparation                                      |
+| [`docs/`](docs/)                                               | [Runtime guide](docs/README.md) and [training optimization notes](docs/performance_optimization.md) |
+
+The import package remains `drrm`; the policy classes are named `RTPolicy*`.
+
+## 2. Model Overview
+
+Results below are reported in the paper. **GPU task success and edge-device latency
+are separate evaluations**; the success rates are not measurements on S600 or S100.
+
+### 2.1 RoboTwin2.0 Simulation
+
+The clean-to-clean benchmark uses 50 tasks, 50 clean demonstrations per task,
+100 evaluation episodes per task, and task-specific checkpoints.
+
+| Method           | Mean success rate · 50 tasks |
+| ---------------- | ---------------------------: |
+| Diffusion Policy |                        28.0% |
+| ACT              |                        29.7% |
+| RDT              |                        34.5% |
+| π0               |                        46.4% |
+| **RTPolicy**     |                    **52.3%** |
+
+Baseline scores are taken from the official single-task leaderboard (Table I).
+
+### 2.2 Real-World Manipulation
+
+GPU evaluation uses an RTX 4090, 200 demonstrations per task, 150K training steps,
+and 50 trials per task. Each method uses its native camera configuration: one view
+for DP / VO-DP, and three views for π0.5 / RTPolicy.
+
+| Method           |  Drawer | Stack & cover | Assembly |      Mean |
+| ---------------- | ------: | ------------: | -------: | --------: |
+| Diffusion Policy |     80% |            8% |       0% |     29.3% |
+| VO-DP            |     84% |           34% |       4% |     40.7% |
+| π0.5             |     88% |           56% |      12% |     52.0% |
+| **RTPolicy**     | **92%** |       **94%** |  **30%** | **72.0%** |
+
+### 2.3 Latency on GPU and Jetson
+
+| Platform            | Precision |   Latency | Frequency |
+| ------------------- | --------- | --------: | --------: |
+| RTX 4090            | FP32      |  23.80 ms |   42.0 Hz |
+| RTX 4090            | FP16      |  10.92 ms |   91.6 Hz |
+| Jetson Orin NX 16GB | FP32      | 266.30 ms |    3.8 Hz |
+| Jetson Orin NX 16GB | FP16      | 143.20 ms |    7.0 Hz |
+
+Measurements are from Table VII. Precision labels follow that table.
+
+### 2.4 Latency on S600 and S100
+
+| Platform | Precision |      Latency |   Frequency |
+| -------- | --------- | -----------: | ----------: |
+| **S600** | **INT16** | **30.35 ms** | **32.9 Hz** |
+| S600     | INT8      |     18.59 ms |     53.8 Hz |
+| S100     | INT16     |    149.72 ms |      6.7 Hz |
+| S100     | INT8      |     86.56 ms |     11.6 Hz |
+
+Batch-1 policy latency includes visual encoding and action generation; it is not
+full camera-to-actuation latency.
+
+### 2.5 Model Downloads
+
+| Resource                        | Availability   |
+| ------------------------------- | -------------- |
+| Paper / arXiv                   | To be released |
+| Demonstration videos            | To be released |
+| Policy checkpoints              | To be released |
+| S600 / S100 deployment packages | To be released |
+
+## 3. Getting Started
+
+### 3.1 Installation
+
+Use Python 3.10 and a hardware-compatible PyTorch installation. The reference
+environment uses PyTorch 2.7.1, torchvision 0.22.1, LeRobot 0.3.3, and transformers 4.56.0.
 
 ```bash
-git clone git@github.com:D-Robotics-AI-Lab/RTPolicy.git
+git clone https://github.com/D-Robotics-AI-Lab/RTPolicy.git
 cd RTPolicy
-# 在已有 RobotWin/RTPolicy 环境中登记当前工作树，不重新解析 Torch/LeRobot 依赖
-conda activate RTPolicy
-python -m pip install -e '.[lance]' --no-deps
+python -m pip install -e '.[lance]'
 ```
 
-全新集群环境先按 `requirements_cluster.txt` 安装锁定依赖，再执行上述 editable 安装。Lance extra 固定 lancedb 0.33.0 / pylance 7.0.0，并要求 pyarrow 23–24。
+For an existing compatible environment, append `--no-deps` to the editable install.
+The locked cluster dependencies are provided in [`requirements_cluster.txt`](requirements_cluster.txt).
 
-仿真评测还需要 RobotWin 那套（Sapien / Vulkan / curobo），和原来 `RTPolicy` 相同。
+### 3.2 Prepare Data and Weights
 
-## 仿真评测
+Supply compatible DINOv3 weights and set
+`model.obs_encoder.emvis_config.backbone_path` to their directory. Datasets,
+checkpoints, simulator assets, and generated outputs are kept outside Git.
+
+The [runtime guide](docs/README.md) covers RobotWin-format data preparation,
+LeRobot v3 → Lance conversion, JPEG/video storage, and checkpoint compatibility.
+For RoboTwin2.0 simulation, prepare SAPIEN, Vulkan, cuRobo, and the official assets:
 
 ```bash
-cd /path/to/RTPolicy
-./scripts/eval/eval_robotwin2.0_parallel.sh \
-  RTPolicy <task_name> agilex_config <checkpoint_dir> 50 8
+cd simulation/robotwin2.0
+bash script/_download_assets.sh
+cd ../..
 ```
 
-`checkpoint_dir` 可以是绝对路径。JPEG 对齐默认开（`RTPOLICY_JPEG_ROUNDTRIP=1`），关：`RTPOLICY_JPEG_ROUNDTRIP=0`。
+## 4. Training, Export and Inference
 
-## ONNX
+### 4.1 Train a Policy
 
-导出（图内预处理 + verify）：
+This is a starter training example. Select a robot configuration, dataset, and
+training budget appropriate to your experiment; it is not the complete paper protocol.
+Point `RTPOLICY_ARTIFACT_DIR` to external artifact storage, such as your EFS mount.
+
+```bash
+export DATASET_ROOT=/path/to/lerobot/task_parent
+export RTPOLICY_ARTIFACT_DIR=/path/to/external/storage/rtpolicy
+
+WANDB_MODE=disabled accelerate launch --config_file configs/accelerate_config.yaml \
+  main.py --config-path=configs/rtpolicy_train \
+  --config-name=dit_fm_dinov3cnnl_3v_bs256 \
+  +observation_config=dinov3cnnl_3v_cnn_b \
+  train_dataset.path="$DATASET_ROOT" train_dataset.task=beat_block_hammer \
+  train_dataset.demo=100 horizon=30 n_obs_steps=1 train_dataset.pad_after=28 \
+  train_batch_size=256 optimizer.lr=2e-4 seed=0 \
+  output_dir="$RTPOLICY_ARTIFACT_DIR/beat_block_hammer_100"
+```
+
+The supplied Accelerate configuration targets eight GPUs; adjust it for your machine.
+Lance backends and optional training optimizations are documented in
+[docs/README.md](docs/README.md) and [docs/performance_optimization.md](docs/performance_optimization.md).
+
+### 4.2 Evaluate in RoboTwin2.0
+
+Pass an absolute checkpoint directory. The example selects four integration steps.
+
+```bash
+export CHECKPOINT_DIR=/absolute/path/to/checkpoint
+RTPOLICY_NFE=4 bash scripts/eval/eval_robotwin2.0_parallel.sh \
+  RTPolicy beat_block_hammer agilex_config "$CHECKPOINT_DIR" 100 2 42
+```
+
+JPEG input alignment is enabled by default through `RTPOLICY_JPEG_ROUNDTRIP=1`.
+
+### 4.3 Export and Run ONNX
 
 ```bash
 python -m drrm.trainer.onnx \
-  --checkpoint-dir <ckpt，含 config.json + model.safetensors> \
-  --onnx-path <out>/model.onnx \
-  --device cpu --export-dtype fp32 \
-  --image-preprocess-in-onnx --verify
+  --checkpoint-dir "$CHECKPOINT_DIR" \
+  --onnx-path "$RTPOLICY_ARTIFACT_DIR/model.onnx" \
+  --device cpu --export-dtype fp32 --image-preprocess-in-onnx --verify
+
+python scripts/infer_onnx.py --help
+python scripts/infer_rtpolicy.py --help
 ```
 
-单帧推理：`python scripts/infer_onnx.py --onnx-path model.onnx ...`
+Install ONNX, ONNX Runtime, and the export dependencies in your deployment environment.
+The exported graph follows the checkpoint configuration, including its sampling settings.
 
-历史导出验证记录见 [EFS实验归档](/data/efs/datasets/xianbao01.hou/rtpolicy_archives/20261016_071211/README.md)。
+### 4.4 TensorRT and Edge Deployment
 
-## TensorRT
-
-x86（4090 / L4，TRT 11）：
+For compatible NVIDIA TensorRT / CUDA environments:
 
 ```bash
-python scripts/build_bench_x86.py build <model.onnx> <model.engine>
-python scripts/build_bench_x86.py bench <model.engine> <inputs_dir>
+python scripts/build_bench_x86.py build \
+  "$RTPOLICY_ARTIFACT_DIR/model.onnx" "$RTPOLICY_ARTIFACT_DIR/model.engine"
+python scripts/build_bench_x86.py bench \
+  "$RTPOLICY_ARTIFACT_DIR/model.engine" /path/to/inputs
 ```
 
-Jetson 精度/测速：`scripts/fp16_convert.py`、`scripts/int8_convert.py`、`scripts/bench_acc_jetson.py`。
+Jetson conversion and benchmarking helpers are provided in
+[`scripts/fp16_convert.py`](scripts/fp16_convert.py),
+[`scripts/int8_convert.py`](scripts/int8_convert.py), and
+[`scripts/bench_acc_jetson.py`](scripts/bench_acc_jetson.py).
+S600 / S100 toolchain instructions and deployment packages will be added separately.
 
-其他模型及PTQ历史实验已统一移至 [EFS实验归档](/data/efs/datasets/xianbao01.hou/rtpolicy_archives/20261016_071211/README.md)。
+## Acknowledgements
 
-## 训练（可选）
+RTPolicy builds on [PyTorch](https://pytorch.org/),
+[Transformers](https://github.com/huggingface/transformers),
+[DINOv3](https://github.com/facebookresearch/dinov3),
+[LeRobot](https://github.com/huggingface/lerobot), and RoboTwin2.0.
+We thank the authors and maintainers of these projects.
 
-Lance/EFS 训练的优化思路、验证结果及原生640×480配置见[性能优化笔记](docs/performance_optimization.md)。
+## Citation
 
-```bash
-accelerate launch --config_file configs/accelerate_config.yaml \
-  main.py --config-path=configs/rtpolicy_train --config-name=<yaml>
-```
+BibTeX and publication details will be added with the paper release.
 
-`WANDB_API_KEY` 从环境变量读，脚本里不再写死。
+## License
 
-## 结果与实验存储
-
-实验代码、单测、日志和历史结果存放在 [EFS实验归档](/data/efs/datasets/xianbao01.hou/rtpolicy_archives/20261016_071211/README.md)。本目录的 `outputs/`、`checkpoints/`、`results/`、`wandb/` 及仿真数据/评测结果目录均软链到 `/data/efs/datasets/xianbao01.hou/rtpolicy_runs/runtime/`，运行产物写入EFS。
+See [LICENSE](LICENSE) for the repository terms. Third-party components retain their
+respective licenses.
