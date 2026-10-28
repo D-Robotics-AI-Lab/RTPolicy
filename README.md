@@ -207,7 +207,6 @@ The exported graph follows the checkpoint configuration, including its sampling 
 ### 4.4 TensorRT and Edge Deployment
 
 Use **FP16 for NVIDIA TensorRT** and **INT16 for S600 / S100 BPU deployment**.
-INT8 deployment is not supported in this release.
 
 Install compatible `tensorrt`, `cuda-python`, `onnx`, and `onnxconverter-common`
 packages in your NVIDIA deployment environment:
