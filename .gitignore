@@ -43,6 +43,7 @@ dist/
 /handoff.md
 /docs/*
 !/docs/README.md
+!/docs/AI_SETUP.md
 
 # RobotWin2 runtime assets and external cuRobo installation
 /simulation/robotwin/

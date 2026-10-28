@@ -63,3 +63,5 @@ same training command above.
 Checkpoints and final policy files are written to `output_dir`. To resume, keep
 the same configuration and output directory and append
 `resume_from_checkpoint=latest` to the training command.
+
+For agent-managed setup and checkpoint export, see the [AI Setup Guide](AI_SETUP.md).
