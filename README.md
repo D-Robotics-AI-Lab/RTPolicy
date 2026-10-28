@@ -30,19 +30,15 @@
 <a href="LICENSE"><img src="assets/badge-license.svg" height="24" alt="License: see LICENSE"></a>
 </p>
 
-<h3 align="center">
-<a href="#1-introduction">Introduction</a> &nbsp;·&nbsp;
-<a href="#2-model-overview">Model&nbsp;overview</a> &nbsp;·&nbsp;
-<a href="#3-getting-started">Get&nbsp;started</a> &nbsp;·&nbsp;
-<a href="#4-training-export-and-inference">Train&nbsp;&amp;&nbsp;deploy</a>
-<br>
-<picture>
-<source media="(prefers-color-scheme: dark) and (prefers-reduced-motion: reduce)" srcset="assets/navigation/navigation-flow-dark-static.svg">
-<source media="(prefers-reduced-motion: reduce)" srcset="assets/navigation/navigation-flow-light-static.svg">
-<source media="(prefers-color-scheme: dark)" srcset="assets/navigation/navigation-flow-dark.svg">
-<img src="assets/navigation/navigation-flow-light.svg" width="720" height="20" alt="" aria-hidden="true">
-</picture>
-</h3>
+<p align="center">
+<a href="#1-introduction"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/navigation/nav-introduction-static.svg"><img src="assets/navigation/nav-introduction.svg" width="350" height="98" alt="Introduction"></picture></a>
+<a href="#2-model-overview"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/navigation/nav-model-overview-static.svg"><img src="assets/navigation/nav-model-overview.svg" width="350" height="98" alt="Model overview"></picture></a>
+</p>
+
+<p align="center">
+<a href="#3-getting-started"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/navigation/nav-get-started-static.svg"><img src="assets/navigation/nav-get-started.svg" width="350" height="98" alt="Get started"></picture></a>
+<a href="#4-training-export-and-inference"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/navigation/nav-train-deploy-static.svg"><img src="assets/navigation/nav-train-deploy.svg" width="350" height="98" alt="Train &amp; deploy"></picture></a>
+</p>
 
 https://github.com/user-attachments/assets/bec0058a-a3c2-423e-a642-4f3794a3e0c9
 
