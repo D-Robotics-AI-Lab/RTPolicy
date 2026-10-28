@@ -27,16 +27,10 @@
 <p align="center">
 <a href="https://github.com/D-Robotics-AI-Lab/RTPolicy"><img src="assets/badge-code.svg" height="24" alt="Code: GitHub"></a>
 <a href="https://github.com/D-Robotics-AI-Lab/RTPolicy.project"><img src="assets/badge-project.svg" height="24" alt="Project page source"></a>
-<a href="https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/demo/RTPolicy.mp4"><img src="assets/badge-video.svg" height="24" alt="Download the full RTPolicy demo"></a>
-<img src="assets/badge-paper.svg" height="24" alt="Paper: coming soon">
-<img src="assets/badge-models.svg" height="24" alt="Models: coming soon">
 <a href="LICENSE"><img src="assets/badge-license.svg" height="24" alt="License: see LICENSE"></a>
 </p>
 
-<a href="https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/demo/RTPolicy.mp4"><img src="assets/demo-preview.gif" width="100%" alt="Continuous eight-second Conveyor Picking preview from the RTPolicy demonstration video; click for the complete 2-minute-18-second MP4"></a>
-
-<p><a href="https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/demo/RTPolicy.mp4"><b>↓ Download full demonstration · 2:18 · MP4</b></a></p>
-<p>The animation is a short continuous preview. The linked video is the complete original demonstration; playback speeds are annotated in the video.</p>
+<!-- RTPOLICY_NATIVE_VIDEO -->
 
 **Multi-view perception. Compact visual tokens. Four-step action generation.**
 
@@ -46,11 +40,16 @@ RTPolicy turns multiple RGB views and robot state into action chunks with a comp
 flow-matching policy. It combines multi-view reasoning with a deployment path for
 edge devices, reaching **32.9 Hz on S600 in INT16** in the paper's latency evaluation.
 
-[Introduction](#1-introduction) · [Model overview](#2-model-overview) · [Getting started](#3-getting-started) · [Training and deployment](#4-training-export-and-inference)
+<p align="center">
+<a href="#1-introduction"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/navigation/nav-01-introduction-dark.svg"><img src="assets/navigation/nav-01-introduction-light.svg" width="165" height="44" alt="Introduction"></picture></a>
+<a href="#2-model-overview"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/navigation/nav-02-model-overview-dark.svg"><img src="assets/navigation/nav-02-model-overview-light.svg" width="165" height="44" alt="Model overview"></picture></a>
+<a href="#3-getting-started"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/navigation/nav-03-get-started-dark.svg"><img src="assets/navigation/nav-03-get-started-light.svg" width="165" height="44" alt="Get started"></picture></a>
+<a href="#4-training-export-and-inference"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/navigation/nav-04-train-deploy-dark.svg"><img src="assets/navigation/nav-04-train-deploy-light.svg" width="165" height="44" alt="Train & deploy"></picture></a>
+</p>
 
 ## 🔥 Updates
 
-The [full RTPolicy demonstration video](https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/demo/RTPolicy.mp4) is available. Paper links and model downloads will be added when released.
+RTPolicy code and demonstration are available.
 
 ## 1. Introduction
 
@@ -70,9 +69,6 @@ cross-view information in a small representation for the action model.
 - **Generate action chunks in four steps.** A flow-matching DiT conditions on the visual
   representation and robot state to predict actions with four integration steps.
 
-The policy uses RGB images and robot state; language instructions and point clouds are
-not required as policy inputs.
-
 ### 1.2 Repository Structure
 
 | Path                                                                   | What to find                                                        |
@@ -85,16 +81,7 @@ not required as policy inputs.
 | [`scripts/`](scripts/) · [`tools/`](tools/)                            | Evaluation, inference, TensorRT tools, and dataset preparation      |
 | [`docs/`](docs/)                                                       | [Runtime guide](docs/README.md)                                     |
 
-The Python import package is `rtpolicy`; the policy classes are named `RTPolicy*`.
-
-Existing checkpoint metadata is remapped to the current package in memory when
-loading; the original configuration and weights are preserved. To persist updated
-metadata, run `tools/rename_ckpt_pkg_map.py` on a copied checkpoint directory.
-
 ## 2. Model Overview
-
-Results below are reported in the paper. **GPU task success and edge-device latency
-are separate evaluations**; the success rates are not measurements on S600 or S100.
 
 ### 2.1 RoboTwin2.0 Simulation
 
@@ -109,24 +96,11 @@ The clean-to-clean benchmark uses 50 tasks, 50 clean demonstrations per task,
 | π0               |                        46.4% |
 | **RTPolicy**     |                    **52.3%** |
 
-Baseline scores are taken from the official single-task leaderboard (Table I).
+Baseline scores are taken from the official single-task leaderboard.
 
-### 2.2 Real-World Manipulation
+[Model checkpoints ↓](#24-model-checkpoints)
 
-GPU evaluation uses an RTX 4090, 200 demonstrations per task, 150K training steps,
-and 50 trials per task. Each method uses its native camera configuration: one view
-for DP / VO-DP, and three views for π0.5 / RTPolicy.
-
-| Method           |  Drawer | Stack & cover | Assembly |      Mean |
-| ---------------- | ------: | ------------: | -------: | --------: |
-| Diffusion Policy |     80% |            8% |       0% |     29.3% |
-| VO-DP            |     84% |           34% |       4% |     40.7% |
-| π0.5             |     88% |           56% |      12% |     52.0% |
-| **RTPolicy**     | **92%** |       **94%** |  **30%** | **72.0%** |
-
-<p align="center"><img src="assets/teaser.webp" width="100%" alt="Physical experiment task sequences from the paper"></p>
-
-### 2.3 Latency on GPU and Jetson
+### 2.2 Latency on GPU and Jetson
 
 | Platform            | Precision |   Latency | Frequency |
 | ------------------- | --------- | --------: | --------: |
@@ -135,9 +109,7 @@ for DP / VO-DP, and three views for π0.5 / RTPolicy.
 | Jetson Orin NX 16GB | FP32      | 266.30 ms |    3.8 Hz |
 | Jetson Orin NX 16GB | FP16      | 143.20 ms |    7.0 Hz |
 
-Values are reported in Table VII. Precision labels follow that table.
-
-### 2.4 Latency on S600 and S100
+### 2.3 Latency on S600 and S100
 
 | Platform | Precision |      Latency |   Frequency |
 | -------- | --------- | -----------: | ----------: |
@@ -146,30 +118,18 @@ Values are reported in Table VII. Precision labels follow that table.
 | S100     | INT16     |    149.72 ms |      6.7 Hz |
 | S100     | INT8      |     86.56 ms |     11.6 Hz |
 
-Batch-1 policy latency includes visual encoding and action generation; it is not
-full camera-to-actuation latency.
-
 #### Quantization HTML Reports
 
-| Device                  | Precision | Original HTML file                                                                                                            |
-| ----------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| S600 · nash-p · 4 cores | INT16     | [Download S600 HTML](https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/quantization/s600.html) |
-| S100 · nash-e · 1 core  | INT16     | [Download S100 HTML](https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/quantization/s100.html) |
+| Device | Precision | File                                                                                                                                               |
+| ------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| S600   | INT16     | [![Download S600 HTML](assets/download-s600.svg)](https://github.com/D-Robotics-AI-Lab/RTPolicy.project/releases/download/project-files/s600.html) |
+| S100   | INT16     | [![Download S100 HTML](assets/download-s100.svg)](https://github.com/D-Robotics-AI-Lab/RTPolicy.project/releases/download/project-files/s100.html) |
 
-Save the downloaded file with its `.html` extension, then open it in Chrome or
-Edge. GitHub's file/Raw views show or download source; they are not hosted report
-pages. For HTTP viewing, follow the [project-page preview instructions](https://github.com/D-Robotics-AI-Lab/RTPolicy.project#view-the-reports-as-webpages).
-These are original self-contained HBDK reports; their performance entries are
-compiler estimates.
+### 2.4 Model Checkpoints
 
-### 2.5 Model Downloads
-
-| Resource                        | Availability                                                                                                          |
-| ------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Paper / arXiv                   | To be released                                                                                                        |
-| Demonstration video             | [Download MP4 · 2:18](https://github.com/D-Robotics-AI-Lab/RTPolicy.project/raw/refs/heads/main/assets/demo/RTPolicy.mp4) |
-| Policy checkpoints              | To be released                                                                                                        |
-| S600 / S100 deployment packages | To be released                                                                                                        |
+| Model       | Google Drive |
+| ----------- | ------------ |
+| RoboTwin2.0 |              |
 
 ## 3. Getting Started
 
@@ -193,9 +153,8 @@ Supply compatible DINOv3 weights and set
 `model.obs_encoder.emvis_config.backbone_path` to their directory. Datasets,
 checkpoints, simulator assets, and generated outputs are kept outside Git.
 
-The [runtime guide](docs/README.md) covers RobotWin-format data preparation,
-dataset conversion and checkpoint compatibility. LeRobot is the default data
-format; Lance storage is optional.
+The [training guide](docs/README.md) covers LeRobot v3 input preparation, JPEG-blob conversion, and Lance training.
+
 For RoboTwin2.0 simulation, prepare SAPIEN, Vulkan, cuRobo, and the official assets:
 
 ```bash
@@ -208,26 +167,7 @@ cd ../..
 
 ### 4.1 Train a Policy
 
-This is a starter training example. Select a robot configuration, dataset, and
-training budget appropriate to your experiment; it is not the complete paper protocol.
-Point `RTPOLICY_ARTIFACT_DIR` to external artifact storage, such as your EFS mount.
-
-```bash
-export DATASET_ROOT=/path/to/lerobot/task_parent
-export RTPOLICY_ARTIFACT_DIR=/path/to/external/storage/rtpolicy
-
-WANDB_MODE=disabled accelerate launch --config_file configs/accelerate_config.yaml \
-  main.py --config-path=configs/rtpolicy_train \
-  --config-name=dit_fm_dinov3cnnl_3v_bs256 \
-  +observation_config=dinov3cnnl_3v_cnn_b \
-  train_dataset.path="$DATASET_ROOT" train_dataset.task=beat_block_hammer \
-  train_dataset.demo=100 horizon=30 n_obs_steps=1 train_dataset.pad_after=28 \
-  train_batch_size=256 optimizer.lr=2e-4 seed=0 \
-  output_dir="$RTPOLICY_ARTIFACT_DIR/beat_block_hammer_100"
-```
-
-The supplied Accelerate configuration targets eight GPUs; adjust it for your machine.
-See the [runtime guide](docs/README.md) for dataset preparation and configuration details.
+Follow the [Lance training guide](docs/README.md#4-train-rtpolicy-on-lance) for dataset preparation and the complete training command.
 
 ### 4.2 Evaluate in RoboTwin2.0
 
