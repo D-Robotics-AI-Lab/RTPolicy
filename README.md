@@ -30,7 +30,7 @@
 <a href="LICENSE"><img src="assets/badge-license.svg" height="24" alt="License: see LICENSE"></a>
 </p>
 
-<!-- RTPOLICY_NATIVE_VIDEO -->
+<video src="https://github.com/user-attachments/assets/bec0058a-a3c2-423e-a642-4f3794a3e0c9" controls width="100%"></video>
 
 **Multi-view perception. Compact visual tokens. Four-step action generation.**
 
