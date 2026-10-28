@@ -51,7 +51,9 @@ edge devices, reaching **32.9 Hz on S600 in INT16** in the paper's latency evalu
 
 RTPolicy code and demonstration are available.
 
-## 1. Introduction
+<a id="1-introduction"></a>
+
+## 🧭 1. Introduction
 
 ### 1.1 Brief Introduction of RTPolicy
 
@@ -81,7 +83,9 @@ cross-view information in a small representation for the action model.
 | [`scripts/`](scripts/) · [`tools/`](tools/)                            | Evaluation, inference, TensorRT tools, and dataset preparation      |
 | [`docs/`](docs/)                                                       | [Runtime guide](docs/README.md)                                     |
 
-## 2. Model Overview
+<a id="2-model-overview"></a>
+
+## 📊 2. Model Overview
 
 ### 2.1 RoboTwin2.0 Simulation
 
@@ -114,9 +118,7 @@ Baseline scores are taken from the official single-task leaderboard.
 | Platform | Precision |      Latency |   Frequency |
 | -------- | --------- | -----------: | ----------: |
 | **S600** | **INT16** | **30.35 ms** | **32.9 Hz** |
-| S600     | INT8      |     18.59 ms |     53.8 Hz |
 | S100     | INT16     |    149.72 ms |      6.7 Hz |
-| S100     | INT8      |     86.56 ms |     11.6 Hz |
 
 #### Quantization HTML Reports
 
@@ -131,7 +133,9 @@ Baseline scores are taken from the official single-task leaderboard.
 | ----------- | ------------ |
 | RoboTwin2.0 |              |
 
-## 3. Getting Started
+<a id="3-getting-started"></a>
+
+## 🚀 3. Getting Started
 
 ### 3.1 Installation
 
@@ -163,7 +167,9 @@ bash script/_download_assets.sh
 cd ../..
 ```
 
-## 4. Training, Export and Inference
+<a id="4-training-export-and-inference"></a>
+
+## ⚡ 4. Training, Export and Inference
 
 ### 4.1 Train a Policy
 
@@ -184,10 +190,12 @@ JPEG input alignment is enabled by default through `RTPOLICY_JPEG_ROUNDTRIP=1`.
 ### 4.3 Export and Run ONNX
 
 ```bash
+export RTPOLICY_ARTIFACT_DIR=/path/to/external/storage/rtpolicy
+
 python -m rtpolicy.trainer.onnx \
   --checkpoint-dir "$CHECKPOINT_DIR" \
   --onnx-path "$RTPOLICY_ARTIFACT_DIR/model.onnx" \
-  --device cpu --export-dtype fp32 --image-preprocess-in-onnx --verify
+  --device cpu --export-dtype fp32 --static-batch --image-preprocess-in-onnx --verify
 
 python scripts/infer_onnx.py --help
 python scripts/infer_rtpolicy.py --help
@@ -198,31 +206,47 @@ The exported graph follows the checkpoint configuration, including its sampling 
 
 ### 4.4 TensorRT and Edge Deployment
 
-For compatible NVIDIA TensorRT / CUDA environments:
+Use **FP16 for NVIDIA TensorRT** and **INT16 for S600 / S100 BPU deployment**.
+INT8 deployment is not supported in this release.
+
+Install compatible `tensorrt`, `cuda-python`, `onnx`, and `onnxconverter-common`
+packages in your NVIDIA deployment environment:
 
 ```bash
+python scripts/fp16_convert.py \
+  "$RTPOLICY_ARTIFACT_DIR/model.onnx" "$RTPOLICY_ARTIFACT_DIR/model-fp16.onnx"
 python scripts/build_bench_x86.py build \
-  "$RTPOLICY_ARTIFACT_DIR/model.onnx" "$RTPOLICY_ARTIFACT_DIR/model.engine"
+  "$RTPOLICY_ARTIFACT_DIR/model-fp16.onnx" "$RTPOLICY_ARTIFACT_DIR/model-fp16.engine" strongly_typed \
+  --workspace-gib 1
 python scripts/build_bench_x86.py bench \
-  "$RTPOLICY_ARTIFACT_DIR/model.engine" /path/to/inputs
+  "$RTPOLICY_ARTIFACT_DIR/model-fp16.engine" /path/to/inputs 100
 ```
 
+Conversion keeps normalization and other sensitive operators in FP32. The engine
+follows the ONNX graph's precision and requires static input shapes.
+The benchmark includes host transfers and allocation.
+
 Jetson conversion and benchmarking helpers are provided in
-[`scripts/fp16_convert.py`](scripts/fp16_convert.py),
-[`scripts/int8_convert.py`](scripts/int8_convert.py), and
+[`scripts/fp16_convert.py`](scripts/fp16_convert.py) and
 [`scripts/bench_acc_jetson.py`](scripts/bench_acc_jetson.py).
 S600 / S100 toolchain instructions and deployment packages will be added separately.
 
-## Acknowledgements
+<a id="acknowledgements"></a>
+
+## 🤝 Acknowledgements
 
 We thank the authors of [DINOv3](https://github.com/facebookresearch/dinov3)
 and [VO-DP](https://github.com/D-Robotics-AI-Lab/DRRM) for sharing their research and code.
 
-## Citation
+<a id="citation"></a>
+
+## 📖 Citation
 
 RTPolicy BibTeX and publication details will be added with the paper release.
 
-## License
+<a id="license"></a>
+
+## 📄 License
 
 See [LICENSE](LICENSE) for the repository terms. Third-party components retain their
 respective licenses.

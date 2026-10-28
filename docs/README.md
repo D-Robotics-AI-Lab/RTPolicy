@@ -4,7 +4,7 @@
 backend, covered separately below. Both examples use RTPolicy with three RoboTwin2
 RGB cameras and 14-dimensional joint control.
 
-## 1. Environment and weights
+## 🛠️ 1. Environment and weights
 
 Use Python 3.10 and a CUDA-compatible PyTorch installation. The reference environment
 uses PyTorch 2.7.1, torchvision 0.22.1, LeRobot 0.3.3, and transformers 4.56.0.
@@ -28,7 +28,7 @@ Download the complete [DINOv3 ConvNeXt-Large pretrained directory](https://huggi
 to `$DINOV3_ROOT`, including the model configuration, image processor configuration,
 and weights. The examples explicitly select this directory.
 
-## 2. Prepare a LeRobot dataset
+## 📦 2. Prepare a LeRobot dataset
 
 The pinned **LeRobot 0.3.3** reader targets the **v2.1 dataset layout**. Place a
 complete compatible dataset at `$LEROBOT_ROOT`:
@@ -60,7 +60,7 @@ Native LeRobot v3 datasets use a different metadata layout and cannot be read
 directly by this pinned reader. If your input is v3.0, the optional Lance branch
 in section 4 provides a supported route without changing the training environment.
 
-## 3. Train directly on LeRobot
+## 🚀 3. Train directly on LeRobot
 
 Run this single-GPU starter example; **no Lance installation or conversion is
 required**:
@@ -83,14 +83,14 @@ python main.py \
 Keep the configuration's `train_dataset.dataset_metadata` entry: this backend
 requires its `LeRobotDatasetMetadata` instance. `train_dataset.demo=null` uses all
 available training episodes after the validation split; use an integer to cap that
-split. The Python package is `rtpolicy`, with `RTPolicy*` policy classes.
+split.
 
 To inspect either training configuration without starting training, append
 `--cfg job --resolve` to its command. For multiple GPUs, launch `main.py` with
 Accelerate and a configuration matching your GPU count; the supplied
 [`configs/accelerate_config.yaml`](../configs/accelerate_config.yaml) targets eight GPUs.
 
-## 4. Optional: train on Lance
+## 🗂️ 4. Optional: train on Lance
 
 Skip this section when using LeRobot directly. The optional converter accepts a
 complete **LeRobot v3.0** source, with `meta/info.json`, `meta/stats.json`,
@@ -141,7 +141,7 @@ python main.py \
 Only this backend uses `dataset_metadata=null`: it reads the converted metadata
 itself, without constructing the pinned LeRobot metadata reader.
 
-## 5. Outputs and resume
+## 💾 5. Outputs and resume
 
 The selected output directory (`$RUN_DIR` or `$LANCE_RUN_DIR`) contains the final
 `config.json` and `model.safetensors`, an `ema/` weights directory, and periodic
