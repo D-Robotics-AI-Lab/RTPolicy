@@ -35,6 +35,13 @@
 <a href="#2-model-overview">Model&nbsp;overview</a> &nbsp;·&nbsp;
 <a href="#3-getting-started">Get&nbsp;started</a> &nbsp;·&nbsp;
 <a href="#4-training-export-and-inference">Train&nbsp;&amp;&nbsp;deploy</a>
+<br>
+<picture>
+<source media="(prefers-color-scheme: dark) and (prefers-reduced-motion: reduce)" srcset="assets/navigation/navigation-flow-dark-static.svg">
+<source media="(prefers-reduced-motion: reduce)" srcset="assets/navigation/navigation-flow-light-static.svg">
+<source media="(prefers-color-scheme: dark)" srcset="assets/navigation/navigation-flow-dark.svg">
+<img src="assets/navigation/navigation-flow-light.svg" width="720" height="20" alt="" aria-hidden="true">
+</picture>
 </h3>
 
 https://github.com/user-attachments/assets/bec0058a-a3c2-423e-a642-4f3794a3e0c9
@@ -228,7 +235,6 @@ The benchmark includes host transfers and allocation.
 Jetson conversion and benchmarking helpers are provided in
 [`scripts/fp16_convert.py`](scripts/fp16_convert.py) and
 [`scripts/bench_acc_jetson.py`](scripts/bench_acc_jetson.py).
-S600 / S100 toolchain instructions and deployment packages will be added separately.
 
 <a id="acknowledgements"></a>
 
@@ -236,12 +242,6 @@ S600 / S100 toolchain instructions and deployment packages will be added separat
 
 We thank the authors of [DINOv3](https://github.com/facebookresearch/dinov3)
 and [VO-DP](https://github.com/D-Robotics-AI-Lab/DRRM) for sharing their research and code.
-
-<a id="citation"></a>
-
-## 📖 Citation
-
-RTPolicy BibTeX and publication details will be added with the paper release.
 
 <a id="license"></a>
 
