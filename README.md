@@ -1,8 +1,8 @@
 <div align="center">
 
 <picture>
-<source media="(prefers-color-scheme: dark)" srcset="assets/rtpolicy-wordmark-dark.svg">
-<img src="assets/rtpolicy-wordmark.svg" width="360" alt="RTPolicy">
+<source media="(prefers-color-scheme: dark)" srcset="assets/rtpolicy-logo-dark.svg">
+<img src="assets/rtpolicy-logo.svg" width="360" alt="RTPolicy">
 </picture>
 
 <picture>
@@ -31,10 +31,10 @@
 </p>
 
 <p align="center">
-<a href="#1-introduction"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/navigation/nav-introduction-compact-static.svg"><img src="assets/navigation/nav-introduction-compact.svg" width="165" height="46" alt="Introduction"></picture></a>
-<a href="#2-model-overview"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/navigation/nav-model-overview-compact-static.svg"><img src="assets/navigation/nav-model-overview-compact.svg" width="165" height="46" alt="Model overview"></picture></a>
-<a href="#3-getting-started"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/navigation/nav-get-started-compact-static.svg"><img src="assets/navigation/nav-get-started-compact.svg" width="165" height="46" alt="Get started"></picture></a>
-<a href="#4-training-export-and-inference"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/navigation/nav-train-deploy-compact-static.svg"><img src="assets/navigation/nav-train-deploy-compact.svg" width="165" height="46" alt="Train &amp; deploy"></picture></a>
+<a href="#1-introduction"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/navigation/nav-introduction-compact-centered-static.svg"><img src="assets/navigation/nav-introduction-compact-centered.svg" width="165" height="46" alt="Introduction"></picture></a>
+<a href="#2-model-overview"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/navigation/nav-model-overview-compact-centered-static.svg"><img src="assets/navigation/nav-model-overview-compact-centered.svg" width="165" height="46" alt="Model overview"></picture></a>
+<a href="#3-getting-started"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/navigation/nav-get-started-compact-centered-static.svg"><img src="assets/navigation/nav-get-started-compact-centered.svg" width="165" height="46" alt="Get started"></picture></a>
+<a href="#4-training-export-and-inference"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/navigation/nav-train-deploy-compact-centered-static.svg"><img src="assets/navigation/nav-train-deploy-compact-centered.svg" width="165" height="46" alt="Train &amp; deploy"></picture></a>
 </p>
 
 https://github.com/user-attachments/assets/bec0058a-a3c2-423e-a642-4f3794a3e0c9
@@ -122,8 +122,8 @@ Baseline scores are taken from the official single-task leaderboard.
 
 | Device | Precision | File                                                                                                                                               |
 | ------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| S600   | INT16     | [![Download S600 HTML](assets/download-s600.svg)](https://github.com/D-Robotics-AI-Lab/RTPolicy.project/releases/download/project-files/s600.html) |
-| S100   | INT16     | [![Download S100 HTML](assets/download-s100.svg)](https://github.com/D-Robotics-AI-Lab/RTPolicy.project/releases/download/project-files/s100.html) |
+| S600   | INT16     | <a href="https://github.com/D-Robotics-AI-Lab/RTPolicy.project/releases/download/project-files/s600.html"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/download-s600-dark.svg"><img src="assets/download-s600-light.svg" width="184" height="32" alt="Download S600 HTML"></picture></a> |
+| S100   | INT16     | <a href="https://github.com/D-Robotics-AI-Lab/RTPolicy.project/releases/download/project-files/s100.html"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/download-s100-dark.svg"><img src="assets/download-s100-light.svg" width="184" height="32" alt="Download S100 HTML"></picture></a> |
 
 ### 2.4 Model Checkpoints
 
