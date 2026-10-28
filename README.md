@@ -31,13 +31,10 @@
 </p>
 
 <p align="center">
-<a href="#1-introduction"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/navigation/nav-introduction-static.svg"><img src="assets/navigation/nav-introduction.svg" width="350" height="98" alt="Introduction"></picture></a>
-<a href="#2-model-overview"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/navigation/nav-model-overview-static.svg"><img src="assets/navigation/nav-model-overview.svg" width="350" height="98" alt="Model overview"></picture></a>
-</p>
-
-<p align="center">
-<a href="#3-getting-started"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/navigation/nav-get-started-static.svg"><img src="assets/navigation/nav-get-started.svg" width="350" height="98" alt="Get started"></picture></a>
-<a href="#4-training-export-and-inference"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/navigation/nav-train-deploy-static.svg"><img src="assets/navigation/nav-train-deploy.svg" width="350" height="98" alt="Train &amp; deploy"></picture></a>
+<a href="#1-introduction"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/navigation/nav-introduction-compact-static.svg"><img src="assets/navigation/nav-introduction-compact.svg" width="165" height="46" alt="Introduction"></picture></a>
+<a href="#2-model-overview"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/navigation/nav-model-overview-compact-static.svg"><img src="assets/navigation/nav-model-overview-compact.svg" width="165" height="46" alt="Model overview"></picture></a>
+<a href="#3-getting-started"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/navigation/nav-get-started-compact-static.svg"><img src="assets/navigation/nav-get-started-compact.svg" width="165" height="46" alt="Get started"></picture></a>
+<a href="#4-training-export-and-inference"><picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/navigation/nav-train-deploy-compact-static.svg"><img src="assets/navigation/nav-train-deploy-compact.svg" width="165" height="46" alt="Train &amp; deploy"></picture></a>
 </p>
 
 https://github.com/user-attachments/assets/bec0058a-a3c2-423e-a642-4f3794a3e0c9
@@ -69,7 +66,7 @@ cross-view information in a small representation for the action model.
 
 - **Reason across views.** A frozen DINOv3 ConvNeXt backbone and view-aware feature fusion
   combine complementary observations from three RGB cameras.
-- **Compress before action generation.** At 480 × 640 inputs, visual compression reduces
+- **Compress before action generation.** In the paper's 480 × 640 (H × W) setting, visual compression reduces
   **900 visual tokens to 12**, giving the DiT a compact observation representation.
 - **Generate action chunks in four steps.** A flow-matching DiT conditions on the visual
   representation and robot state to predict actions with four integration steps.
@@ -107,14 +104,12 @@ Baseline scores are taken from the official single-task leaderboard.
 
 [Model checkpoints ↓](#24-model-checkpoints)
 
-### 2.2 Latency on GPU and Jetson
+### 2.2 Latency on GPU
 
 | Platform            | Precision |   Latency | Frequency |
 | ------------------- | --------- | --------: | --------: |
 | RTX 4090            | FP32      |  23.80 ms |   42.0 Hz |
 | RTX 4090            | FP16      |  10.92 ms |   91.6 Hz |
-| Jetson Orin NX 16GB | FP32      | 266.30 ms |    3.8 Hz |
-| Jetson Orin NX 16GB | FP16      | 143.20 ms |    7.0 Hz |
 
 ### 2.3 Latency on S600 and S100
 
@@ -142,17 +137,11 @@ Baseline scores are taken from the official single-task leaderboard.
 
 ### 3.1 Installation
 
-Use Python 3.10 and a hardware-compatible PyTorch installation. The reference
-environment uses PyTorch 2.7.1, torchvision 0.22.1, LeRobot 0.3.3, and transformers 4.56.0.
-
 ```bash
 git clone https://github.com/D-Robotics-AI-Lab/RTPolicy.git
 cd RTPolicy
 python -m pip install -e .
 ```
-
-For an existing compatible environment, append `--no-deps` to the editable install.
-The locked cluster dependencies are provided in [`requirements_cluster.txt`](requirements_cluster.txt).
 
 ### 3.2 Prepare Data and Weights
 
@@ -227,10 +216,6 @@ python scripts/build_bench_x86.py bench \
 Conversion keeps normalization and other sensitive operators in FP32. The engine
 follows the ONNX graph's precision and requires static input shapes.
 The benchmark includes host transfers and allocation.
-
-Jetson conversion and benchmarking helpers are provided in
-[`scripts/fp16_convert.py`](scripts/fp16_convert.py) and
-[`scripts/bench_acc_jetson.py`](scripts/bench_acc_jetson.py).
 
 <a id="acknowledgements"></a>
 
