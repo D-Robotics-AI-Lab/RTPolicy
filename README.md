@@ -30,6 +30,13 @@
 <a href="LICENSE"><img src="assets/badge-license.svg" height="24" alt="License: see LICENSE"></a>
 </p>
 
+<h3 align="center">
+<a href="#1-introduction">Introduction</a> &nbsp;·&nbsp;
+<a href="#2-model-overview">Model&nbsp;overview</a> &nbsp;·&nbsp;
+<a href="#3-getting-started">Get&nbsp;started</a> &nbsp;·&nbsp;
+<a href="#4-training-export-and-inference">Train&nbsp;&amp;&nbsp;deploy</a>
+</h3>
+
 https://github.com/user-attachments/assets/bec0058a-a3c2-423e-a642-4f3794a3e0c9
 
 **Multi-view perception. Compact visual tokens. Four-step action generation.**
@@ -39,13 +46,6 @@ https://github.com/user-attachments/assets/bec0058a-a3c2-423e-a642-4f3794a3e0c9
 RTPolicy turns multiple RGB views and robot state into action chunks with a compact
 flow-matching policy. It combines multi-view reasoning with a deployment path for
 edge devices, reaching **32.9 Hz on S600 in INT16** in the paper's latency evaluation.
-
-<p align="center">
-<a href="#1-introduction"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/navigation/nav-01-introduction-dark.svg"><img src="assets/navigation/nav-01-introduction-light.svg" width="165" height="44" alt="Introduction"></picture></a>
-<a href="#2-model-overview"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/navigation/nav-02-model-overview-dark.svg"><img src="assets/navigation/nav-02-model-overview-light.svg" width="165" height="44" alt="Model overview"></picture></a>
-<a href="#3-getting-started"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/navigation/nav-03-get-started-dark.svg"><img src="assets/navigation/nav-03-get-started-light.svg" width="165" height="44" alt="Get started"></picture></a>
-<a href="#4-training-export-and-inference"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/navigation/nav-04-train-deploy-dark.svg"><img src="assets/navigation/nav-04-train-deploy-light.svg" width="165" height="44" alt="Train & deploy"></picture></a>
-</p>
 
 ## 🔥 Updates
 
