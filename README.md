@@ -30,7 +30,7 @@
 <a href="LICENSE"><img src="assets/badge-license.svg" height="24" alt="License: see LICENSE"></a>
 </p>
 
-<video src="https://github.com/user-attachments/assets/bec0058a-a3c2-423e-a642-4f3794a3e0c9" controls width="100%"></video>
+https://github.com/user-attachments/assets/bec0058a-a3c2-423e-a642-4f3794a3e0c9
 
 **Multi-view perception. Compact visual tokens. Four-step action generation.**
 
@@ -153,7 +153,7 @@ Supply compatible DINOv3 weights and set
 `model.obs_encoder.emvis_config.backbone_path` to their directory. Datasets,
 checkpoints, simulator assets, and generated outputs are kept outside Git.
 
-The [training guide](docs/README.md) covers LeRobot v3 input preparation, JPEG-blob conversion, and Lance training.
+Train directly on LeRobot v2.1 datasets with the default backend. Lance is optional; the [Training Guide](docs/README.md) also covers converting LeRobot v3.0 data to JPEG-blob Lance.
 
 For RoboTwin2.0 simulation, prepare SAPIEN, Vulkan, cuRobo, and the official assets:
 
@@ -167,7 +167,7 @@ cd ../..
 
 ### 4.1 Train a Policy
 
-Follow the [Lance training guide](docs/README.md#4-train-rtpolicy-on-lance) for dataset preparation and the complete training command.
+Follow the [Training Guide](docs/README.md) to train directly with LeRobot or use the optional Lance backend.
 
 ### 4.2 Evaluate in RoboTwin2.0
 
