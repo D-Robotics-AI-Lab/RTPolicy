@@ -1,0 +1,46 @@
+# @package _global_
+# RoboTwin2 export example. Model structure and input shapes come from the checkpoint.
+_target_: rtpolicy.trainer.onnx.onnx
+
+checkpoint_dir: ???
+output_dir: ???  # A fresh absolute directory outside the repository.
+onnx_path: ${output_dir}/model.onnx
+
+device: cpu
+export_dtype: fp32
+export_target: policy
+batch_size: 1
+dynamic_batch: false
+opset_version: 19
+image_preprocess_in_onnx: true
+use_external_data: true
+export_modules_as_functions: false
+save_netron_model: false
+
+# Keep the checkpoint's backbone and FM sampling settings unless overridden.
+backbone_path: null
+num_inference_timesteps: null
+
+verify: true
+fail_on_verify_mismatch: true
+rtol: 1e-4
+atol: 1e-4
+
+save_calibration_data: true
+calibration_data_dir: ${output_dir}/onnx_calibration
+num_calibration_samples: 1
+prefer_validation_dataset: true
+seed: 0
+
+# Optional LeRobot v2.1 dataset with image bytes in Parquet, as produced by
+# tools/preprocess_robotwin2.py. Null uses synthetic verification inputs.
+train_dataset:
+  root: null
+  val_ratio: 0.02
+
+hydra:
+  run:
+    dir: ${output_dir}
+  output_subdir: null
+  job:
+    chdir: false

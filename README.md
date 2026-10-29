@@ -78,7 +78,7 @@ cross-view information in a small representation for the action model.
 | [`rtpolicy/models/policy/rtpolicy/`](rtpolicy/models/policy/rtpolicy/) | Visual encoder, multi-view fusion, adapters, DiT, and policy runner |
 | [`rtpolicy/datasets/`](rtpolicy/datasets/)                             | Dataset readers and preprocessing interfaces                        |
 | [`rtpolicy/trainer/`](rtpolicy/trainer/)                               | Training and ONNX export                                            |
-| [`configs/`](configs/)                                                 | Training, observation, and robot configurations             |
+| [`configs/`](configs/)                                                 | Training, observation, robot, and ONNX export configurations        |
 | [`simulation/robotwin2.0/`](simulation/robotwin2.0/)                   | RoboTwin2.0 environments and RTPolicy adapter                       |
 | [`scripts/`](scripts/) · [`tools/`](tools/)                            | Evaluation, inference, TensorRT tools, and dataset preparation      |
 | [`docs/`](docs/)                                                       | [Runtime guide](docs/README.md)                                     |
@@ -181,35 +181,41 @@ JPEG input alignment is enabled by default through `RTPOLICY_JPEG_ROUNDTRIP=1`.
 
 ### 4.3 Export and Run ONNX
 
-```bash
-export RTPOLICY_ARTIFACT_DIR=/path/to/external/storage/rtpolicy
+Set `checkpoint_dir` and `output_dir` in the
+[RoboTwin2 export example](configs/rtpolicy_onnx/rtpolicy_onnx_robotwin2.yaml).
 
-python -m rtpolicy.trainer.onnx \
-  --checkpoint-dir "$CHECKPOINT_DIR" \
-  --onnx-path "$RTPOLICY_ARTIFACT_DIR/model.onnx" \
-  --device cpu --export-dtype fp32 --static-batch --image-preprocess-in-onnx --verify
+```bash
+python main.py --config-path=configs/rtpolicy_onnx \
+  --config-name=rtpolicy_onnx_robotwin2
 
 python scripts/infer_onnx.py --help
 ```
 
 Install ONNX, ONNX Runtime, and the export dependencies in your deployment environment.
 The exported graph follows the checkpoint configuration, including its sampling settings.
+To generate samples from a converted RoboTwin2 dataset, set `train_dataset.root`
+to its LeRobot v2.1 directory and choose `num_calibration_samples`.
+The example saves verification inputs and outputs under `output_dir/onnx_calibration`.
 
 ### 4.4 TensorRT and Edge Deployment
 
 Use **FP16 for NVIDIA TensorRT** and **INT16 for S600 / S100 BPU deployment**.
 
 Install compatible `tensorrt`, `cuda-python`, `onnx`, and `onnxconverter-common`
-packages in your NVIDIA deployment environment:
+packages in your NVIDIA deployment environment. Set `RTPOLICY_ARTIFACT_DIR` to the
+export configuration's `output_dir`:
 
 ```bash
+export RTPOLICY_ARTIFACT_DIR=/path/to/external/storage/rtpolicy
+
 python scripts/fp16_convert.py \
   "$RTPOLICY_ARTIFACT_DIR/model.onnx" "$RTPOLICY_ARTIFACT_DIR/model-fp16.onnx"
 python scripts/build_bench_x86.py build \
   "$RTPOLICY_ARTIFACT_DIR/model-fp16.onnx" "$RTPOLICY_ARTIFACT_DIR/model-fp16.engine" strongly_typed \
   --workspace-gib 1
 python scripts/build_bench_x86.py bench \
-  "$RTPOLICY_ARTIFACT_DIR/model-fp16.engine" /path/to/inputs 100
+  "$RTPOLICY_ARTIFACT_DIR/model-fp16.engine" \
+  "$RTPOLICY_ARTIFACT_DIR/onnx_calibration/sample_000/inputs" 100
 ```
 
 Conversion keeps normalization and other sensitive operators in FP32. The engine
