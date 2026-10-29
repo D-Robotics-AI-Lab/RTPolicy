@@ -1,4 +1,4 @@
-# Native 640x480, three cameras, 16-D real-robot state/action.
+# Native 640x480, three cameras, 16-D state/action.
 defaults:
   - policy_config/dit_fm
   - robot_config/real_stack_cover_3v
