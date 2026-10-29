@@ -25,7 +25,7 @@ RoboTwin2 source images are **240 × 320 (H × W)**; preprocessing preserves the
 The default LeRobot reader uses the **v2.1 layout**: JSONL metadata and per-episode
 Parquet files. Keep `train_dataset.dataset_metadata` as configured.
 
-For raw RoboTwin2 HDF5 recordings, install the data tools and convert task folders:
+For raw RoboTwin2 HDF5 recordings, convert task folders:
 
 ```bash
 bash scripts/dataset/robotwin2lerobot.sh \
@@ -41,6 +41,43 @@ python main.py --config-path=configs/rtpolicy_train \
 
 Keep training settings in the selected configuration. Append `--cfg job --resolve`
 to inspect it without starting training.
+
+## Pretrain and fine-tune
+
+These RoboTwin2 recipes use DINOv3 ConvNeXt-Base with three cameras, a batch size
+of 256, and seed 0. Both use `horizon: 32`, `n_obs_steps: 3`, and
+`n_image_obs_steps: 1`: three state observations and the latest image from each
+camera. The action and state dimensions are 14; source images remain 240 × 320.
+
+| Stage | Recipe | Data | Updates | Learning rate |
+| --- | --- | --- | ---: | ---: |
+| Pretrain | [pt_dinov3cnnb_3v_lance_300k](../configs/rtpolicy_train/pt_dinov3cnnb_3v_lance_300k.yaml) | Joint-task Lance, 2500 demonstrations | 300K | 2e-4 |
+| Fine-tune | [ft_dinov3cnnb_3v_30k](../configs/rtpolicy_train/ft_dinov3cnnb_3v_30k.yaml) | Single-task LeRobot v2.1, 50 demonstrations | 30K | 2e-5 |
+
+In each recipe, set `train_dataset.path` to the dataset parent,
+`model.obs_encoder.emvis_config.backbone_path` to the external DINOv3
+ConvNeXt-Base weights, and `output_dir` to a new external run directory.
+
+For pretraining, prepare the converted Lance dataset at
+`train_dataset.path/joint_finetune_2500`; see the Lance conversion instructions
+below. The recipe uses all 2500 demonstrations without a validation split.
+
+```bash
+python -m pip install -e '.[lance]'
+python main.py --config-path=configs/rtpolicy_train \
+  --config-name=pt_dinov3cnnb_3v_lance_300k
+```
+
+For fine-tuning, set `train_dataset.task` (for example, `finetune_lift_pot`) and
+`checkpoint_dir` to the final pretrained policy directory containing
+`model.safetensors`. The recipe initializes policy weights and keeps the
+pretraining normalizer while starting a new optimizer and learning-rate schedule.
+Leave `resume_from_checkpoint: null` when starting fine-tuning.
+
+```bash
+python main.py --config-path=configs/rtpolicy_train \
+  --config-name=ft_dinov3cnnb_3v_30k
+```
 
 ## Optional: Lance
 

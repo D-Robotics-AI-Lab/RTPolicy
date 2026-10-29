@@ -1,0 +1,39 @@
+# RoboTwin2: pretrain on 50 tasks / 2500 demonstrations in Lance format.
+defaults:
+  - policy_config/dit_fm
+  - robot_config/robotwin2_agilex_3v
+  - dataset_config/demo_separated_dataset
+  - observation_config/dinov3cnnl_3v_cnn_b
+  - _self_
+
+horizon: 32
+n_obs_steps: 3
+n_image_obs_steps: 1
+max_train_steps: 300000
+train_batch_size: 256
+gradient_accumulation_steps: 1
+mixed_precision: bf16
+seed: 0
+optimizer:
+  lr: 2e-4
+normalizer_source: dataset
+val_period: 10000
+checkpointing_period: 10000
+report_to: null
+
+train_dataset:
+  backend: lance
+  dataset_metadata: null
+  path: null  # External parent of the joint-task Lance dataset.
+  task: joint_finetune_2500
+  repo_id: ${train_dataset.task}
+  demo: 2500
+  pad_after: 30
+  val_ratio: 0.0
+
+model:
+  obs_encoder:
+    emvis_config:
+      backbone_path: null  # External DINOv3 ConvNeXt-Base weight directory.
+
+output_dir: null  # New external pretraining run directory.

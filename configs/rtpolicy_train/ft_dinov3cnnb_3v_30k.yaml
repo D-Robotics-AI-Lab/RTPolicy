@@ -1,0 +1,36 @@
+# RoboTwin2: fine-tune the pretrained policy on 50 single-task demonstrations.
+defaults:
+  - policy_config/dit_fm
+  - robot_config/robotwin2_agilex_3v
+  - dataset_config/demo_separated_dataset
+  - observation_config/dinov3cnnl_3v_cnn_b
+  - _self_
+
+horizon: 32
+n_obs_steps: 3
+n_image_obs_steps: 1
+max_train_steps: 30000
+train_batch_size: 256
+gradient_accumulation_steps: 1
+mixed_precision: bf16
+seed: 0
+optimizer:
+  lr: 2e-5
+normalizer_source: checkpoint
+checkpoint_dir: null  # Final pretrained policy directory with model.safetensors.
+report_to: null
+
+train_dataset:
+  backend: lerobot
+  path: null  # External parent of the single-task LeRobot v2.1 dataset.
+  task: null  # For example, finetune_lift_pot.
+  demo: 50
+  pad_after: 30
+  val_ratio: 0.02
+
+model:
+  obs_encoder:
+    emvis_config:
+      backbone_path: null  # External DINOv3 ConvNeXt-Base weight directory.
+
+output_dir: null  # New external fine-tuning run directory.

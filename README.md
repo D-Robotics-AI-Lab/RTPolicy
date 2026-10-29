@@ -192,6 +192,15 @@ and numerical errors, with generated files outside the repository.
 
 Follow the [Training Guide](docs/README.md) to train directly with LeRobot or use the optional Lance backend.
 
+The RoboTwin2 pretraining and fine-tuning recipes use DINOv3 ConvNeXt-Base:
+
+| Stage | Configuration | Dataset | Training steps |
+| --- | --- | --- | ---: |
+| Pretrain | [Three-view Lance](configs/rtpolicy_train/pt_dinov3cnnb_3v_lance_300k.yaml) | 50 tasks, 2500 demonstrations | 300K |
+| Fine-tune | [Three-view LeRobot](configs/rtpolicy_train/ft_dinov3cnnb_3v_30k.yaml) | 50 demonstrations per task | 30K |
+
+See [Pretrain and fine-tune](docs/README.md#pretrain-and-fine-tune) for configuration fields and commands.
+
 ### 4.2 Evaluate in RoboTwin2.0
 
 Set the checkpoint and backend in the external
