@@ -2,7 +2,7 @@
 policy_name: RTPolicy
 task_name: null
 task_config: null
-ckpt_setting: unet_23d_1f
+ckpt_setting: null  # Absolute checkpoint directory.
 seed: 42
 instruction_type: unseen
 
