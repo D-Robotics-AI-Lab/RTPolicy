@@ -2,16 +2,19 @@
 
 Give a coding agent this guide, the **repository URL or checkout**, a **checkpoint
 directory**, and a writable **external artifact root** (EFS where available).
-ONNX is the default target; select NVIDIA separately for TensorRT validation.
+The root requirements file installs PyTorch, RTPolicy, RoboTwin2, and ONNX.
+TensorRT is an optional extra for the same CUDA 12 environment; install and run it
+when requested. Task evaluation remains an explicit step.
 
 ## Copy to your agent
 
 ```text
 Follow https://github.com/D-Robotics-AI-Lab/RTPolicy/blob/main/docs/AI_SETUP.md for https://github.com/D-Robotics-AI-Lab/RTPolicy, using LOCAL_REPO_PATH=/path/to/RTPolicy, CHECKPOINT_DIRECTORY=/path/to/checkpoint, and ARTIFACT_ROOT=/path/to/external/artifacts.
-Create a fresh compatible environment under ARTIFACT_ROOT, route caches and generated files there, and preserve shared environments and the original checkpoint.
+Create a fresh compatible environment under ARTIFACT_ROOT, install the root requirements.txt, route caches and generated files there, and preserve shared environments and the original checkpoint.
 Inspect the checkpoint to derive actual cameras, state/action shapes, history, horizon, active NFE, and preprocessing; preserve those settings and check the native RoboTwin2 image convention.
 Verify rtpolicy imports and export static FP32 ONNX with --verify, explicitly distinguishing synthetic export checks from representative-input validation.
-If I select NVIDIA, also build and validate mixed FP16 separately from BPU INT16; install simulation software or assets only if I request evaluation.
+If I request TensorRT, install the tensorrt extra, build and run mixed-FP16 inference on NVIDIA, and compare it with the FP32 reference. Prepare cuRobo and simulator assets only if I request task evaluation, keeping RoboTwin2 code unchanged.
+Validate each requested stage once; repeat an evaluation only if I request it or a new failure requires a targeted check.
 Return reproducible commands, resolved versions/configuration, I/O, numerical errors and tolerances, artifact paths, and exact missing-resource blockers, keeping generated results outside Git.
 ```
 
@@ -38,7 +41,8 @@ and the evaluation override, without editing the checkpoint's `config.json`.
 
 ## 2. Prepare an isolated environment
 
-Read [`pyproject.toml`](../pyproject.toml) for the runtime and optional dependencies.
+Read the root [`requirements.txt`](../requirements.txt) and
+[`pyproject.toml`](../pyproject.toml) for the unified stack and optional dependencies.
 Inspect the host and select a
 compatible interpreter and matched PyTorch/torchvision build before installing
 repository dependencies. Use a fresh venv or conda prefix under the artifact root.
@@ -46,20 +50,18 @@ Route package/model caches and temporary files there too (`PIP_CACHE_DIR`, `HF_H
 `TORCH_HOME`, `XDG_CACHE_HOME`, `TMPDIR`; `CUDA_CACHE_PATH` for NVIDIA).
 Resolve symlinks to confirm the actual storage location.
 
-For a CPU ONNX environment, after installing the selected PyTorch pair:
+Run from the repository root in the new environment:
 
 ```bash
-python -m pip install -e /path/to/RTPolicy
-python -m pip install onnx onnxruntime
+python -m pip install -r requirements.txt
 python -m pip check
 python -c "import rtpolicy, rtpolicy.models; print(rtpolicy.__file__)"
 python -m rtpolicy.trainer.onnx --help
 ```
 
-Use `onnxruntime-gpu` in place of `onnxruntime` when CUDA verification is selected,
-and record the provider actually used. Fix dependency or import failures in the
-isolated environment. Simulator installation and assets belong to an explicitly
-requested evaluation step.
+Record the ONNX execution provider actually used. Fix dependency or import
+failures in the isolated environment. cuRobo compilation and simulator assets
+belong to an explicitly requested task-evaluation step.
 
 ## 3. Export and verify FP32
 
@@ -97,24 +99,35 @@ Record task settings, seed, NFE, JPEG setting, precision, original result logs,
 and actual accepted seeds. Report each backend's measured success count without
 altering the evaluator's preflight or case selection to force agreement.
 
-## 4. Optional NVIDIA mixed FP16
+## 4. NVIDIA TensorRT inference
 
-For a selected NVIDIA target, use an idle GPU and an isolated compatible TensorRT
-setup with `cuda-python` and `onnxconverter-common`. Starting from the verified
-static FP32 export:
+For a requested TensorRT target, append its dependencies to the existing
+environment and use an idle NVIDIA GPU. Starting from the verified static FP32
+export:
 
 ```bash
+python -m pip install -e '.[tensorrt]'
+
 python scripts/fp16_convert.py \
   /path/to/external/artifacts/model.onnx /path/to/external/artifacts/model-fp16.onnx
 python scripts/build_bench_x86.py build \
   /path/to/external/artifacts/model-fp16.onnx /path/to/external/artifacts/model-fp16.engine \
   strongly_typed
+
+python scripts/infer_tensorrt.py \
+  --engine-path /path/to/external/artifacts/model-fp16.engine \
+  --inputs-dir /path/to/external/artifacts/onnx_calibration/sample_000/inputs \
+  --output-dir /path/to/external/artifacts/tensorrt_outputs
 ```
 
 Execute the engine on the same saved inputs and compare it with the FP32 reference;
 report finite checks, per-output errors, declared tolerances, and the input source.
 Sensitive operators remain FP32. **S100/S600 BPU INT16 uses a separate toolchain**
 and needs its own target validation.
+
+For requested RoboTwin2 evaluation, select `backend: tensorrt` in the external
+evaluation YAML, set `model_path` to the engine and `metadata_path` to the original
+FP32 export sidecar, and call the unchanged evaluator through the launcher.
 
 ## Deliver the result
 

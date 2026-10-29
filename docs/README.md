@@ -4,7 +4,7 @@ RTPolicy trains directly on LeRobot datasets by default. Lance is optional.
 Run commands from the repository root.
 
 ```bash
-python -m pip install -e .
+python -m pip install -r requirements.txt
 ```
 
 ## Configure
@@ -28,7 +28,6 @@ Parquet files. Keep `train_dataset.dataset_metadata` as configured.
 For raw RoboTwin2 HDF5 recordings, install the data tools and convert task folders:
 
 ```bash
-python -m pip install -e '.[data]'
 bash scripts/dataset/robotwin2lerobot.sh \
   /path/to/raw/tasks /path/to/external/lerobot beat_block_hammer
 ```

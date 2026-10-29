@@ -51,6 +51,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+tensorrt = [
+    "onnx==1.19.1",
+    "onnxruntime-gpu==1.22.0",
+    "onnxconverter-common==1.16.0",
+    "tensorrt-cu12==11.1.0.106",
+    "cuda-python==12.9.2",
+]
 data = [
     "pandas",
     "pyarrow",

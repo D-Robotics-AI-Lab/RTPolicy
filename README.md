@@ -143,8 +143,11 @@ Baseline scores are taken from the official single-task leaderboard.
 ```bash
 git clone https://github.com/D-Robotics-AI-Lab/RTPolicy.git
 cd RTPolicy
-python -m pip install -e .
+python -m pip install -r requirements.txt
 ```
+
+The root [requirements.txt](requirements.txt) covers PyTorch, RTPolicy, RoboTwin2,
+and ONNX. TensorRT can be added to the same CUDA 12 environment in Section 4.4.
 
 ### 3.2 Prepare Data and Weights
 
@@ -157,10 +160,28 @@ Train directly on LeRobot v2.1 datasets with the default backend. Lance is optio
 For RoboTwin2.0 simulation, prepare SAPIEN, Vulkan, cuRobo, and the official assets:
 
 ```bash
-python -m pip install -e . -r requirements/robotwin2.txt
 cd simulation/robotwin2.0
 bash script/_download_assets.sh
 cd ../..
+```
+
+### 3.3 🤖 AI-assisted Setup and Validation
+
+Give your coding agent the [AI Setup Guide](docs/AI_SETUP.md), a checkpoint,
+and an external artifact directory. Replace the paths below and paste this prompt:
+
+```text
+Follow https://github.com/D-Robotics-AI-Lab/RTPolicy/blob/main/docs/AI_SETUP.md.
+Repository/checkout: /path/to/RTPolicy
+Checkpoint: /path/to/checkpoint
+External artifacts: /path/to/external/artifacts
+Create an isolated compatible environment, install the root requirements.txt,
+verify imports, then export and verify ONNX.
+If I request TensorRT, install the tensorrt extra and build/run the engine.
+Preserve checkpoint settings and any benchmark overrides I provide.
+Keep RoboTwin2 code unchanged; run task evaluation only when I request it.
+Validate each requested stage once and return the commands, versions, outputs,
+and numerical errors, with generated files outside the repository.
 ```
 
 <a id="4-training-export-and-inference"></a>
@@ -199,7 +220,7 @@ isolated environment to enable an atomic file-copy fallback for the JIT cache.
 ```bash
 git clone --branch v0.7.8 --depth 1 https://github.com/NVlabs/curobo.git /path/to/external/curobo
 MAX_JOBS=1 python -m pip install -e /path/to/external/curobo \
-  --no-build-isolation -r requirements/robotwin2.txt
+  --no-build-isolation -r requirements.txt
 ```
 
 ### 4.3 Export and Run ONNX
@@ -214,7 +235,6 @@ python main.py --config-path=configs/rtpolicy_onnx \
 python scripts/infer_onnx.py --help
 ```
 
-Install ONNX, ONNX Runtime, and the export dependencies in your deployment environment.
 The exported graph follows the checkpoint configuration, including its sampling settings.
 For a benchmark with an explicit NFE override, set `num_inference_timesteps` in
 the export YAML and use the same `RTPOLICY_NFE` during evaluation.
@@ -226,9 +246,13 @@ The example saves verification inputs and outputs under `output_dir/onnx_calibra
 
 Use **FP16 for NVIDIA TensorRT** and **INT16 for S600 / S100 BPU deployment**.
 
-Install compatible `tensorrt`, `cuda-python`, `onnx`, and `onnxconverter-common`
-packages in your NVIDIA deployment environment. Set `RTPOLICY_ARTIFACT_DIR` to the
-export configuration's `output_dir`:
+Add the optional TensorRT tools to the installed environment:
+
+```bash
+python -m pip install -e '.[tensorrt]'
+```
+
+Set `RTPOLICY_ARTIFACT_DIR` to the export configuration's `output_dir`:
 
 ```bash
 export RTPOLICY_ARTIFACT_DIR=/path/to/external/storage/rtpolicy
@@ -238,6 +262,12 @@ python scripts/fp16_convert.py \
 python scripts/build_bench_x86.py build \
   "$RTPOLICY_ARTIFACT_DIR/model-fp16.onnx" "$RTPOLICY_ARTIFACT_DIR/model-fp16.engine" strongly_typed \
   --workspace-gib 1
+
+python scripts/infer_tensorrt.py \
+  --engine-path "$RTPOLICY_ARTIFACT_DIR/model-fp16.engine" \
+  --inputs-dir "$RTPOLICY_ARTIFACT_DIR/onnx_calibration/sample_000/inputs" \
+  --output-dir "$RTPOLICY_ARTIFACT_DIR/tensorrt_outputs"
+
 python scripts/build_bench_x86.py bench \
   "$RTPOLICY_ARTIFACT_DIR/model-fp16.engine" \
   "$RTPOLICY_ARTIFACT_DIR/onnx_calibration/sample_000/inputs" 100
@@ -246,6 +276,17 @@ python scripts/build_bench_x86.py bench \
 Conversion keeps normalization and other sensitive operators in FP32. The engine
 follows the ONNX graph's precision and requires static input shapes.
 The benchmark includes host transfers and allocation.
+
+For RoboTwin2 inference, set these fields in the external
+[evaluation YAML](configs/rtpolicy_eval/robotwin2.yaml), then run the launcher in
+Section 4.2. Use the original FP32 export's metadata, whose public I/O is preserved
+by mixed-FP16 conversion:
+
+```yaml
+backend: tensorrt
+model_path: /path/to/artifacts/model-fp16.engine
+metadata_path: /path/to/artifacts/model.onnx.metadata.json
+```
 
 <a id="acknowledgements"></a>
 
