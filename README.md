@@ -24,6 +24,9 @@
 
 <p><sup>*</sup>Equal contribution &nbsp; <sup>†</sup>Project lead &nbsp; <sup>✉</sup>Corresponding authors</p>
 
+<p>Wei Sui: <a href="mailto:wei.sui@d-robotics.cc">wei.sui@d-robotics.cc</a><br>
+Cong Yang: <a href="mailto:cong.yang@suda.edu.cn">cong.yang@suda.edu.cn</a></p>
+
 <p align="center">
 <a href="https://github.com/D-Robotics-AI-Lab/RTPolicy"><img src="assets/badge-code.svg" height="24" alt="Code: GitHub"></a>
 <a href="https://github.com/D-Robotics-AI-Lab/RTPolicy.project"><img src="assets/badge-project.svg" height="24" alt="Project page source"></a>
