@@ -5,9 +5,8 @@ from typing import Dict
 
 import hydra
 from transformers import AutoModel
-from rtpolicy.common.checkpoint import normalize_checkpoint_metadata
+from rtpolicy.common.checkpoint import normalize_checkpoint_metadata, load_checkpoint_weights
 from rtpolicy.models.base_policy import BasePolicy
-from safetensors.torch import load_model
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +32,7 @@ def load_policy(ckp_path, use_ckp_code = False, device = None) -> BasePolicy:
     if use_ckp_code:
         policy_model = AutoModel.from_pretrained(ckp_path, trust_remote_code=True)
         # load state dict of normalizer
-        load_model(policy_model, os.path.join(ckp_path, "model.safetensors"), strict=False, device=device)
+        load_checkpoint_weights(policy_model, os.path.join(ckp_path, "model.safetensors"), device=device)
     else:
         if config_dict is None:
             raise FileNotFoundError(config_path)
@@ -43,7 +42,7 @@ def load_policy(ckp_path, use_ckp_code = False, device = None) -> BasePolicy:
         policy_model = PolicyClass(config)
         policy_model = policy_model.to(device)
         # load state dict of normalizer
-        load_model(policy_model, os.path.join(ckp_path, "model.safetensors"), strict=False, device=device)
+        load_checkpoint_weights(policy_model, os.path.join(ckp_path, "model.safetensors"), device=device)
     return policy_model
 
 class BaseRunner:

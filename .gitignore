@@ -51,4 +51,4 @@ dist/
 /simulation/robotwin2.0/data_smoke/
 /simulation/robotwin2.0/assets/*
 !/simulation/robotwin2.0/assets/_download.py
-/simulation/robotwin2.0/envs/curobo/
+/simulation/robotwin2.0/envs/curobo

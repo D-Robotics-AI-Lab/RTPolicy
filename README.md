@@ -154,6 +154,7 @@ Train directly on LeRobot v2.1 datasets with the default backend. Lance is optio
 For RoboTwin2.0 simulation, prepare SAPIEN, Vulkan, cuRobo, and the official assets:
 
 ```bash
+python -m pip install -e . -r requirements/robotwin2.txt
 cd simulation/robotwin2.0
 bash script/_download_assets.sh
 cd ../..
@@ -169,15 +170,34 @@ Follow the [Training Guide](docs/README.md) to train directly with LeRobot or us
 
 ### 4.2 Evaluate in RoboTwin2.0
 
-Pass an absolute checkpoint directory. The example selects four integration steps.
+Set the checkpoint and backend in the external
+[evaluation configuration](configs/rtpolicy_eval/robotwin2.yaml). The adapter
+uses RoboTwin2's original policy interface; simulator, task, and evaluation code
+remain unchanged.
 
 ```bash
-export CHECKPOINT_DIR=/absolute/path/to/checkpoint
-RTPOLICY_NFE=4 bash scripts/eval/eval_robotwin2.0_parallel.sh \
-  RTPolicy beat_block_hammer agilex_config "$CHECKPOINT_DIR" 100 2 42
+python scripts/eval/run_robotwin2.py \
+  --config configs/rtpolicy_eval/robotwin2.yaml \
+  --runtime-dir /path/to/external/evaluation
 ```
 
 JPEG input alignment is enabled by default through `RTPOLICY_JPEG_ROUNDTRIP=1`.
+Select `backend`, `model_path`, `metadata_path`, and `test_num` in the
+[evaluation configuration](configs/rtpolicy_eval/robotwin2.yaml).
+The launcher prepares an external working directory and calls the original
+evaluator. It does not alter preflight checks or seed selection. Keep checkpoint,
+NFE, seed, and task settings identical when comparing backends.
+
+Build cuRobo v0.7.8 in an external directory using the same environment. Set
+`WARP_CACHE_PATH` outside the repository. If its filesystem rejects directory
+renames with `EXDEV`, run `python tools/patch_warp_cache.py --apply` in this
+isolated environment to enable an atomic file-copy fallback for the JIT cache.
+
+```bash
+git clone --branch v0.7.8 --depth 1 https://github.com/NVlabs/curobo.git /path/to/external/curobo
+MAX_JOBS=1 python -m pip install -e /path/to/external/curobo \
+  --no-build-isolation -r requirements/robotwin2.txt
+```
 
 ### 4.3 Export and Run ONNX
 
@@ -193,6 +213,8 @@ python scripts/infer_onnx.py --help
 
 Install ONNX, ONNX Runtime, and the export dependencies in your deployment environment.
 The exported graph follows the checkpoint configuration, including its sampling settings.
+For a benchmark with an explicit NFE override, set `num_inference_timesteps` in
+the export YAML and use the same `RTPOLICY_NFE` during evaluation.
 To generate samples from a converted RoboTwin2 dataset, set `train_dataset.root`
 to its LeRobot v2.1 directory and choose `num_calibration_samples`.
 The example saves verification inputs and outputs under `output_dir/onnx_calibration`.

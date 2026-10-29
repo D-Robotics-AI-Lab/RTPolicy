@@ -21,7 +21,8 @@ Read `config.json` and the safetensors header before loading large weights.
 The current loader requires `config.json` and `model.safetensors`; identify missing
 files or an incompatible weight layout explicitly. Use the installed `rtpolicy`
 classes and `rtpolicy.common.checkpoint.load_checkpoint_config`, which normalizes
-supported historical class references in memory.
+supported historical class and backbone metadata in memory. Inference and export
+also normalize known historical tensor names and require complete weight coverage.
 
 Record `obs_encoder.rgb_key`, `shape_meta`, `action_key`/`supervision_key`,
 `n_obs_steps`, `n_image_obs_steps`, `horizon`, `n_action_steps`, and
@@ -32,6 +33,8 @@ Derive shapes from this checkpoint rather than a previous experiment.
 Default RoboTwin2 D435 source images are **240 × 320 (H × W)**. Preserve the
 checkpoint's preprocessing, including internal alignment; changing raw image size
 or NFE requires an explicit experiment request. Keep the source checkpoint unchanged.
+If the user supplies a benchmark NFE, apply it through the export configuration
+and the evaluation override, without editing the checkpoint's `config.json`.
 
 ## 2. Prepare an isolated environment
 
@@ -60,31 +63,39 @@ requested evaluation step.
 
 ## 3. Export and verify FP32
 
-Run from the repository root in the new environment. Substitute the supplied paths;
-use a fresh artifact directory. This command keeps the checkpoint's sampling settings:
+Run from the repository root in the new environment. Use the same
+[RoboTwin2 export YAML](../configs/rtpolicy_onnx/rtpolicy_onnx_robotwin2.yaml) as the
+README: set `checkpoint_dir`, a fresh external `output_dir`, and the selected
+`device`. Keep `num_inference_timesteps: null` unless the user supplied a benchmark
+override. Static FP32 export, image preprocessing, verification, and external
+calibration outputs are configured in that YAML.
 
 ```bash
-python -m rtpolicy.trainer.onnx \
-  --checkpoint-dir /path/to/checkpoint \
-  --onnx-path /path/to/external/artifacts/model.onnx \
-  --device cpu --export-dtype fp32 --static-batch \
-  --image-preprocess-in-onnx --no-export-modules-as-functions \
-  --calibration-data-dir /path/to/external/artifacts/verification \
-  --no-save-netron-model --verify
+python main.py --config-path=configs/rtpolicy_onnx \
+  --config-name=rtpolicy_onnx_robotwin2
 ```
 
-The absolute calibration path keeps generated samples and metrics outside the
-checkpoint directory. Keep the `.onnx`, its external weight file, and
+The configured output directory keeps samples and metrics outside the checkpoint.
+Keep the `.onnx`, its external weight file, and
 `.onnx.metadata.json` together; verify their actual I/O against the checkpoint.
 Read the per-sample `verification_metrics.json`, require finite outputs, and report
 both `action` and `action_pred` errors and tolerances.
 
-The direct CLI uses synthetic inputs by default. Label that result **synthetic
+Without a calibration dataset, the exporter uses synthetic inputs. Label that result **synthetic
 export verification**. Replay representative user-provided observations for a
 real-input numerical check, using the recorded I/O and the same noise trajectory.
 If those observations are absent, report that check as pending; numerical export
 verification alone does not establish robot task success. Missing weights or
 required backbone assets block export until resolved.
+
+For requested closed-loop validation, use the external
+[evaluation configuration](../configs/rtpolicy_eval/robotwin2.yaml) and
+[launcher](../scripts/eval/run_robotwin2.py). Keep the simulator's environment,
+task, and evaluation code unchanged. The launcher calls its original evaluator
+from an external working directory; backend adaptation stays in `rtpolicy`.
+Record task settings, seed, NFE, JPEG setting, precision, original result logs,
+and actual accepted seeds. Report each backend's measured success count without
+altering the evaluator's preflight or case selection to force agreement.
 
 ## 4. Optional NVIDIA mixed FP16
 

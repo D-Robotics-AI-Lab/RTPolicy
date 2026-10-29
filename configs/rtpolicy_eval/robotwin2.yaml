@@ -1,0 +1,17 @@
+# Passed directly to RoboTwin2's unchanged evaluation script.
+policy_name: rtpolicy.deployment.robotwin
+task_name: lift_pot
+task_config: agilex_config
+ckpt_setting: null
+checkpoint_num: null
+expert_data_num: 50
+test_num: 100
+num_process: 1
+seed: 0
+instruction_type: unseen
+head_camera_type: D435
+
+backend: pytorch  # pytorch | onnx | tensorrt
+model_path: null
+metadata_path: null
+num_inference_timesteps: null  # Optional benchmark override; match the ONNX export.

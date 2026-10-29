@@ -211,10 +211,14 @@ def _create_session(onnx_path, metadata, providers=None):
         sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_DISABLE_ALL
         disabled_optimizers = ["SimplifiedLayerNormFusion"]
 
+    selected = []
+    for item in providers or _default_providers(ort, metadata):
+        name, options = item if isinstance(item, tuple) else (item, {})
+        selected.append((name, {"use_tf32": "0", **options}) if name == "CUDAExecutionProvider" else item)
     return ort.InferenceSession(
         onnx_path,
         sess_options=sess_options,
-        providers=providers or _default_providers(ort, metadata),
+        providers=selected,
         disabled_optimizers=disabled_optimizers,
     )
 

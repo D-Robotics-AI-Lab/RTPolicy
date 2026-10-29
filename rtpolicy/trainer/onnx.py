@@ -5,6 +5,7 @@ import json
 import logging
 import os
 import shutil
+from contextlib import nullcontext
 from typing import Any, Dict, List, Optional, Tuple
 
 import hydra
@@ -12,11 +13,10 @@ import torch
 import torch.nn.functional as F
 from omegaconf import OmegaConf
 from safetensors import safe_open
-from safetensors.torch import load_model
 from transformers import AutoConfig
 
 from rtpolicy.models.base_runner import load_policy
-from rtpolicy.common.checkpoint import load_checkpoint_config, normalize_checkpoint_metadata
+from rtpolicy.common.checkpoint import load_checkpoint_config, normalize_checkpoint_metadata, load_checkpoint_weights
 
 
 _ORIGINAL_INTERPOLATE = F.interpolate
@@ -899,7 +899,7 @@ def _load_policy_from_config_dict(
 
     policy = policy_cls(policy_config)
     policy = policy.to(device)
-    load_model(policy, os.path.join(checkpoint_dir, "model.safetensors"), strict=False, device=device)
+    load_checkpoint_weights(policy, os.path.join(checkpoint_dir, "model.safetensors"), device=device)
     return policy
 
 
@@ -1034,7 +1034,7 @@ def _should_do_constant_folding(device: str) -> bool:
     return True
 
 
-def _onnxruntime_providers_for_device(device: str) -> List[str]:
+def _onnxruntime_providers_for_device(device: str) -> List[Any]:
     providers = ["CPUExecutionProvider"]
     device_type = _device_type(device)
     if device_type != "cuda":
@@ -1047,7 +1047,9 @@ def _onnxruntime_providers_for_device(device: str) -> List[str]:
 
     available_providers = set(ort.get_available_providers())
     if "CUDAExecutionProvider" in available_providers:
-        return ["CUDAExecutionProvider", "CPUExecutionProvider"]
+        # Match the FP32 PyTorch reference instead of silently using TF32
+        # multiplications during an FP32 export-equivalence check.
+        return [("CUDAExecutionProvider", {"use_tf32": "0"}), "CPUExecutionProvider"]
 
     logger.warning(
         "device=%s was used for export, but onnxruntime CUDAExecutionProvider is unavailable; "
@@ -1074,12 +1076,14 @@ def _create_onnxruntime_session_for_verify(
         sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_DISABLE_ALL
         disabled_optimizers = ["SimplifiedLayerNormFusion"]
 
-    return ort.InferenceSession(
+    session = ort.InferenceSession(
         onnx_path,
         sess_options=sess_options,
         providers=_onnxruntime_providers_for_device(device),
         disabled_optimizers=disabled_optimizers,
     )
+    logger.info("ONNX verification providers: %s; options: %s", session.get_providers(), session.get_provider_options())
+    return session
 
 
 def _serialize_config_value(value: Any) -> Any:
@@ -2379,7 +2383,9 @@ class PolicyExportWrapper(torch.nn.Module):
         )
         action_mask = policy.action_mask.expand(batch_size, -1, -1).to(device=device)
 
-        noisy_action = noise_trajectory.to(device=device, dtype=dtype)
+        # Sampling overwrites conditioned positions. Keep caller-owned noise
+        # unchanged for replay and for the subsequent ONNX verification run.
+        noisy_action = noise_trajectory.to(device=device, dtype=dtype).clone()
         noisy_action = policy._zero_static_joints(noisy_action)
         state_mask = ~action_mask
         num_steps = int(policy.num_inference_timesteps)
@@ -2429,8 +2435,22 @@ def verify_module_onnx_export(
     except ImportError as exc:
         raise RuntimeError("verify requested but onnxruntime/numpy is unavailable") from exc
 
-    with torch.no_grad():
-        torch_output_values = module(**sample_input)
+    attention_context = nullcontext()
+    if any(value.device.type == 'cuda' for value in sample_input.values()):
+        if hasattr(torch.nn, 'attention'):
+            attention_context = torch.nn.attention.sdpa_kernel(torch.nn.attention.SDPBackend.MATH)
+        else:
+            attention_context = torch.backends.cuda.sdp_kernel(
+                enable_flash=False, enable_math=True, enable_mem_efficient=False)
+    original_tf32 = torch.backends.cuda.matmul.allow_tf32
+    try:
+        torch.backends.cuda.matmul.allow_tf32 = False
+        # Use a reproducible FP32 mathematical reference for export comparison.
+        # Native BF16 policy evaluation retains its own runtime kernel settings.
+        with torch.no_grad(), torch.backends.cudnn.flags(allow_tf32=False), attention_context:
+            torch_output_values = module(**{key: value.clone() for key, value in sample_input.items()})
+    finally:
+        torch.backends.cuda.matmul.allow_tf32 = original_tf32
 
     if isinstance(torch_output_values, torch.Tensor):
         torch_output_values = (torch_output_values,)
