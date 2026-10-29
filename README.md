@@ -130,9 +130,16 @@ Baseline scores are taken from the official single-task leaderboard.
 
 ### 2.4 Model Checkpoints
 
-| Model       | Google Drive |
-| ----------- | ------------ |
-| RoboTwin2.0 |              |
+| Model | Format | Google Drive |
+| --- | --- | --- |
+| RoboTwin2 pretraining · 300K steps | PyTorch | [Download](https://drive.google.com/file/d/1mUBhBGJkg7Pc1zkn1EEEqU6XcfmXxMQp/view) |
+| lift_pot · fine-tuned | PyTorch | [Download](https://drive.google.com/file/d/1382Y1VLgH7LEyJH49ZuVK5N0vsZo3XP5/view) |
+| lift_pot · fine-tuned | ONNX FP32 | [Download](https://drive.google.com/file/d/1RbjJ23fG8AjcpAz9O2Qlz75UXzMvb1NT/view) |
+| lift_pot · fine-tuned | TensorRT mixed FP16 | [Download](https://drive.google.com/file/d/1wjgUX8ptoTxo3MZX3gk3ke532PKDmYdK/view) |
+
+[All checkpoint files](https://drive.google.com/open?id=1UxLqe8mIYPSrPwuCchVBL2StSbZ67_0x). Each archive includes its configuration and usage notes.
+
+The `lift_pot` evaluation configurations use **NFE4, seed0**. The TensorRT engine was built on **NVIDIA L4 with TensorRT 11.1.0.106**; its build environment is included in the archive.
 
 <a id="3-getting-started"></a>
 
