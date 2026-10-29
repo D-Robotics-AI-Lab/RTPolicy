@@ -8,7 +8,6 @@ from collections import deque
 import yaml
 from datetime import datetime
 import importlib
-import dill
 from argparse import ArgumentParser
 from rtpolicy.common.pytorch_util import dict_apply
 from rtpolicy.models.base_policy import BasePolicy

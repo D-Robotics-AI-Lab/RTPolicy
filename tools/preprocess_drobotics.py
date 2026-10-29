@@ -12,8 +12,11 @@ layout follows json_to_lerobot.py:
 Resize, fps downsampling, video/image writing, camera renames, and metadata
 generation are kept compatible with json_to_lerobot.py.
 Usage:
-    python tools/json_to_lerobot.py \
-        --raw-dir tools/episode_0000 \
+    python tools/preprocess_drobotics.py \
+        --raw-dir /path/to/raw/json/episodes \
+        --output-dir /path/to/external/lerobot \
+        --state-output-key state \
+        --rename head_camera=head_cam left_wrist_camera=left_cam right_wrist_camera=right_cam \
         --repo-id D-Robotics/pick_pen_into_holder \
         --image-size 640 480 \
         --target-fps 10
@@ -610,7 +613,7 @@ def json_to_lerobot_vodpp(
         robot_type: Backfill ``info.robot_type`` for legacy data.json.
         source_fps: Backfill ``info.fps`` for legacy data.json.
         state_output_key: Output field for low-dimensional state. Defaults to
-            ``agent_pos`` for current RTPolicy configs. Use ``state`` for exact
+            ``agent_pos`` for legacy datasets. Use ``state`` for current RTPolicy configs and exact
             leaf-name output from ``observation.state``.
         drop_fields: Optional output fields to omit, e.g. ``endpose`` or a
             camera field. ``action`` and ``state_output_key`` are required.

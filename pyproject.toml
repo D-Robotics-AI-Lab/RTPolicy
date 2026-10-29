@@ -31,6 +31,15 @@ classifiers = [
 ]
 
 dependencies = [
+    "torch",
+    "torchvision",
+    "numpy",
+    "Pillow",
+    "einops>=0.8",
+    "huggingface-hub>=0.34.2",
+    "omegaconf>=2.3,<2.4",
+    "PyYAML",
+    "tqdm",
     "lerobot==0.3.3",
     "zarr==2.18.3",
     "diffusers==0.33.1",
@@ -42,6 +51,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+data = [
+    "pandas",
+    "pyarrow",
+    "h5py>=3.10",
+    "loguru>=0.7",
+    "tyro>=0.8",
+]
 lance = [
     "lancedb==0.33.0",
     "pylance==7.0.0",

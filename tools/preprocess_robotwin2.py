@@ -1,6 +1,4 @@
 import os
-import pickle
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Any
 import cv2
@@ -9,8 +7,6 @@ import numpy as np
 import argparse
 from loguru import logger
 import shutil
-from PIL import Image
-import io
 
 from lerobot.datasets.lerobot_dataset import LeRobotDataset
 
@@ -92,7 +88,7 @@ FEATURES = {
 
 
 def _extract_frame(data: Dict[str, Any]) -> Dict[str, Any]:
-    """Convert raw pickle dictionary to the format expected by LeRobot."""
+    """Convert a decoded RoboTwin2 HDF5 frame to the LeRobot schema."""
     endpose = np.concatenate((
         data["endpose"]['left_endpose'], 
         [data["endpose"]['left_gripper']], 
@@ -165,7 +161,7 @@ def main(args):
 
         # Remove the images folder to avoid filling the disk
         img_dir = os.path.join(args.dst_dir, "images")
-        if os.path.exists(img_dir):
+        if not args.keep_images and os.path.exists(img_dir):
             shutil.rmtree(img_dir)
 
     if args.push:
@@ -179,6 +175,7 @@ if __name__ == "__main__":
     parser.add_argument("--repo", type=str, required=True, help="HuggingFace repository ID")
     parser.add_argument("--task", type=str, required=True, help="task name")
     parser.add_argument("--fps", type=int, default=30, help="Frames per second for the dataset")
+    parser.add_argument("--keep-images", action="store_true", help="Keep the image-writer cache after frames are embedded in Parquet")
     parser.add_argument("--push", type=bool, default=False, help="Whether to push the dataset to the HuggingFace Hub")
     args = parser.parse_args()
 

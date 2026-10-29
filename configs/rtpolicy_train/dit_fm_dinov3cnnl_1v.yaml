@@ -9,4 +9,4 @@ defaults:
 # val_period: -1 # -1 to disable validation during training
 
 n_obs_steps: 1
-output_dir: "/data/tos/xianbao01.hou/robochallenge_checkpoints/${train_dataset.task}_${train_dataset.demo}/fm_dinov3cnnl_1v_cnn_l"
+output_dir: null  # Set an external experiment directory.

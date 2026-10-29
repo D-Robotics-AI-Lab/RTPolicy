@@ -35,8 +35,8 @@ or NFE requires an explicit experiment request. Keep the source checkpoint uncha
 
 ## 2. Prepare an isolated environment
 
-Read [`pyproject.toml`](../pyproject.toml) and the
-[dependency reference](../requirements_cluster.txt). Inspect the host and select a
+Read [`pyproject.toml`](../pyproject.toml) for the runtime and optional dependencies.
+Inspect the host and select a
 compatible interpreter and matched PyTorch/torchvision build before installing
 repository dependencies. Use a fresh venv or conda prefix under the artifact root.
 Route package/model caches and temporary files there too (`PIP_CACHE_DIR`, `HF_HOME`,

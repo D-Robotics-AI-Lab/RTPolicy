@@ -3,8 +3,8 @@ echo "Current path: $(pwd)"
 
 if [ "$#" -lt 3 ]; then
     echo "Usage: $0 <source_data_root> <target_data_root> <task_name1> [task_name2 ...]"
-    echo "Example Single Task:   $0 ./datasets/robotwin2.0_D435_Agilex_200_rgb ./datasets/drrm_robotwin2.0_D435_Agilex_200_rgb adjust_bottle"
-    echo "Example Multiple Tasks: $0 ./datasets/robotwin2.0_D435_Agilex_200_rgb ./datasets/drrm_robotwin2.0_D435_Agilex_200_rgb adjust_bottle click_bell"
+    echo "Example Single Task:   $0 /path/to/raw/tasks /path/to/external/lerobot adjust_bottle"
+    echo "Example Multiple Tasks: $0 /path/to/raw/tasks /path/to/external/lerobot adjust_bottle click_bell"
     exit 1
 fi
 

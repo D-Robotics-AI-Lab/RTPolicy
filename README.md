@@ -78,7 +78,7 @@ cross-view information in a small representation for the action model.
 | [`rtpolicy/models/policy/rtpolicy/`](rtpolicy/models/policy/rtpolicy/) | Visual encoder, multi-view fusion, adapters, DiT, and policy runner |
 | [`rtpolicy/datasets/`](rtpolicy/datasets/)                             | Dataset readers and preprocessing interfaces                        |
 | [`rtpolicy/trainer/`](rtpolicy/trainer/)                               | Training and ONNX export                                            |
-| [`configs/`](configs/)                                                 | Training, observation, robot, and export configurations             |
+| [`configs/`](configs/)                                                 | Training, observation, and robot configurations             |
 | [`simulation/robotwin2.0/`](simulation/robotwin2.0/)                   | RoboTwin2.0 environments and RTPolicy adapter                       |
 | [`scripts/`](scripts/) · [`tools/`](tools/)                            | Evaluation, inference, TensorRT tools, and dataset preparation      |
 | [`docs/`](docs/)                                                       | [Runtime guide](docs/README.md)                                     |
@@ -190,7 +190,6 @@ python -m rtpolicy.trainer.onnx \
   --device cpu --export-dtype fp32 --static-batch --image-preprocess-in-onnx --verify
 
 python scripts/infer_onnx.py --help
-python scripts/infer_rtpolicy.py --help
 ```
 
 Install ONNX, ONNX Runtime, and the export dependencies in your deployment environment.

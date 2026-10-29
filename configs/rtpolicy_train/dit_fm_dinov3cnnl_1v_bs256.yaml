@@ -12,4 +12,4 @@ n_obs_steps: 1
 train_batch_size: 256
 optimizer:
   lr: 2e-4
-output_dir: "/data/tos/xianbao01.hou/robochallenge_checkpoints/${train_dataset.task}_${train_dataset.demo}/fm_dinov3cnnl_1v_cnn_l_bs256_lr2e-4_temp-branch"
+output_dir: null  # Set an external experiment directory.

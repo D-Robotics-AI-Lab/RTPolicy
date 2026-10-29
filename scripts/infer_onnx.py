@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ONNX Runtime inference script for exported VODP+ policy models.
+"""ONNX Runtime inference script for exported RTPolicy models.
 
 This script:
   1. Loads an ONNX model and its companion ``*.metadata.json`` (or ``--metadata-path``)

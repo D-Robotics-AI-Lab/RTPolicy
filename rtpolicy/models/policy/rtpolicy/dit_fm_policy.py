@@ -6,9 +6,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange, reduce
-from diffusers.schedulers.scheduling_ddpm import DDPMScheduler
-from diffusers.schedulers.scheduling_dpmsolver_multistep import \
-    DPMSolverMultistepScheduler
 
 from rtpolicy.models.base_policy import BasePolicy
 # from .module.obs_encoder import SceneEncoder as RTPolicyEncoder

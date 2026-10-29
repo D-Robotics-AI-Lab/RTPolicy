@@ -15,8 +15,7 @@ Set the experiment fields in the existing configuration files:
 - [Observation encoder](../configs/rtpolicy_train/observation_config/dinov3cnnl_3v.yaml): `model.obs_encoder.emvis_config.backbone_path` (pretrained weight directory).
 - [Training recipe](../configs/rtpolicy_train/dit_fm_dinov3cnnl_3v.yaml): `output_dir` (a new experiment directory).
 
-The dataset parent and task are initially unset, and the recipe's output path
-must be replaced. The dataset root is `train_dataset.path/train_dataset.task`.
+The dataset root is `train_dataset.path/train_dataset.task`.
 Keep datasets, weights, and outputs on external storage.
 
 The [three-view recipe](../configs/rtpolicy_train/dit_fm_dinov3cnnl_3v.yaml) uses
@@ -25,6 +24,14 @@ RoboTwin2 source images are **240 × 320 (H × W)**; preprocessing preserves the
 
 The default LeRobot reader uses the **v2.1 layout**: JSONL metadata and per-episode
 Parquet files. Keep `train_dataset.dataset_metadata` as configured.
+
+For raw RoboTwin2 HDF5 recordings, install the data tools and convert task folders:
+
+```bash
+python -m pip install -e '.[data]'
+bash scripts/dataset/robotwin2lerobot.sh \
+  /path/to/raw/tasks /path/to/external/lerobot beat_block_hammer
+```
 
 ## Train
 

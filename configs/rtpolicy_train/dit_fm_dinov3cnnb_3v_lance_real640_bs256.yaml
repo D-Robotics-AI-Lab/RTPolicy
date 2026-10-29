@@ -30,4 +30,4 @@ train_dataset:
   image_cache_size_bytes: 0
   video_cache_size_bytes: 0
 
-output_dir: checkpoints/rtpolicy/${train_dataset.task}_${train_dataset.demo}/dinov3cnnb_3v_lance_real640_bs256
+output_dir: null  # Set an external experiment directory.

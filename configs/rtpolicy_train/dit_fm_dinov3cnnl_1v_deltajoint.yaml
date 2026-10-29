@@ -6,7 +6,7 @@ defaults:
   - _self_
 
 n_obs_steps: 1
-output_dir: ${base_dir}_dinov3cnnl_1v_deltajoint
+output_dir: null  # Set an external experiment directory.
 
 model:
   action_key: 'delta_state'
