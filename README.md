@@ -11,15 +11,15 @@
 </picture>
 
 <p>
-<b>Xianbao Hou</b><sup>1,3,*</sup> · <b>Zehao Ni</b><sup>2,3,*</sup> · <b>Yonghao He</b><sup>4,†</sup> · <b>Lingfeng Qian</b><sup>3</sup><br>
-<b>Xin Shi</b><sup>3</sup> · <b>Hu Su</b><sup>5</sup> · <b>Wei Sui</b><sup>3,✉</sup> · <b>Cong Yang</b><sup>1,✉</sup>
+<b>Xianbao Hou</b><sup>1,3,*</sup> · <b>Zehao Ni</b><sup>2,3,*</sup> · <b>Yonghao He</b><sup>3,†</sup> · <b>Lingfeng Qian</b><sup>3</sup><br>
+<b>Xin Shi</b><sup>3</sup> · <b>Hu Su</b><sup>4</sup> · <b>Wei Sui</b><sup>3,✉</sup> · <b>Cong Yang</b><sup>1,✉</sup>
 </p>
 
 <p>
 <sup>1</sup>School of Future Science and Engineering, Soochow University<br>
 <sup>2</sup>Shanghai Research Institute for Intelligent Autonomous Systems, Tongji University<br>
-<sup>3</sup>D-Robotics &nbsp; <sup>4</sup>Intime AI<br>
-<sup>5</sup>State Key Laboratory of Multimodal Artificial Intelligence Systems,<br>Institute of Automation, Chinese Academy of Sciences
+<sup>3</sup>D-Robotics<br>
+<sup>4</sup>State Key Laboratory of Multimodal Artificial Intelligence Systems,<br>Institute of Automation, Chinese Academy of Sciences
 </p>
 
 <p><sup>*</sup>Equal contribution &nbsp; <sup>†</sup>Project lead &nbsp; <sup>✉</sup>Corresponding authors</p>
