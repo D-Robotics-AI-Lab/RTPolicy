@@ -166,6 +166,9 @@ For a task-success measurement, add this to the agent prompt:
 Also evaluate lift_pot once with the requested backend using the released evaluation.yaml, NFE4, seed0, and 100 episodes. Prepare the official simulator assets and dependencies on external storage; keep RoboTwin2 task/evaluator code and case selection unchanged. Preserve logs and actual accepted seeds.
 ```
 
+For a rebuilt TensorRT engine, set `metadata_path` to the verified FP32 export's
+`model.onnx.metadata.json`; the public input/output types are preserved by conversion.
+
 Copy the selected package's `evaluation.yaml` into the external artifact root and
 set its absolute `ckpt_setting` (PyTorch) or `model_path` (ONNX/TensorRT). The
 included YAML already fixes the released task, NFE and seed. Prepare cuRobo,
