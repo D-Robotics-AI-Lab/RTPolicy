@@ -24,3 +24,6 @@ ninja
 # ONNX export and inference.
 onnx==1.19.1
 onnxruntime-gpu==1.22.0
+
+# Public Google Drive checkpoint downloads.
+gdown>=5.2,<6

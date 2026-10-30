@@ -97,7 +97,7 @@ The clean-to-clean benchmark uses 50 tasks, 50 clean demonstrations per task,
 
 | Method           | Mean success rate · 50 tasks |
 | ---------------- | ---------------------------: |
-| Diffusion Policy |                        28.0% |
+| DP |                        28.0% |
 | ACT              |                        29.7% |
 | RDT              |                        34.5% |
 | π0               |                        46.4% |
@@ -174,21 +174,20 @@ cd ../..
 
 ### 3.3 🤖 AI-assisted Setup and Validation
 
-Give your coding agent the [AI Setup Guide](docs/AI_SETUP.md), a checkpoint,
-and an external artifact directory. Replace the paths below and paste this prompt:
+Give your coding agent the [AI Setup Guide](docs/AI_SETUP.md) and an external
+artifact directory. It automatically downloads the released `lift_pot` checkpoint
+from Google Drive, verifies its checksum, installs the environment and validates
+an ONNX export. Paste this prompt after replacing the artifact path:
 
 ```text
-Follow https://github.com/D-Robotics-AI-Lab/RTPolicy/blob/main/docs/AI_SETUP.md.
-Repository/checkout: /path/to/RTPolicy
-Checkpoint: /path/to/checkpoint
-External artifacts: /path/to/external/artifacts
-Create an isolated compatible environment, install the root requirements.txt,
-verify imports, then export and verify ONNX.
-If I request TensorRT, install the tensorrt extra and build/run the engine.
-Preserve checkpoint settings and any benchmark overrides I provide.
-Keep RoboTwin2 code unchanged; run task evaluation only when I request it.
-Validate each requested stage once and return the commands, versions, outputs,
-and numerical errors, with generated files outside the repository.
+Follow https://github.com/D-Robotics-AI-Lab/RTPolicy/blob/main/docs/AI_SETUP.md for https://github.com/D-Robotics-AI-Lab/RTPolicy, using ARTIFACT_ROOT=/path/to/external/artifacts. Use an existing checkout if available; otherwise clone the repository.
+Create an isolated compatible environment, install the root requirements.txt, and route downloads, checkpoints, caches and outputs outside Git.
+Automatically download the released lift_pot PyTorch model from the Google Drive links in the guide, verify its pinned SHA256 and safely extract it. Reuse verified cached files. A local checkpoint directory is optional.
+Inspect the checkpoint and export static FP32 ONNX with verification, using the released lift_pot protocol NFE4 and seed0 through configuration overrides; preserve checkpoint weights and stored config.json. If I provide another checkpoint or protocol, use those settings instead.
+Validate the exported policy once and report action/action_pred errors against the same FP32 reference and identical inputs/noise. Label synthetic inputs explicitly.
+If I request published ONNX or TensorRT validation, download and verify the matching package too. Check the TensorRT build environment before using its engine; rebuild from FP32 ONNX when the host requires it.
+Run RoboTwin2 task evaluation only when I request it, through the external launcher with the simulator code unchanged. Validate each requested stage once.
+Return reproducible commands, source/download identities and checksums, resolved versions/settings, real artifact paths and validation results. Report concrete blockers without substituting different models or claiming unrun tests.
 ```
 
 <a id="4-training-export-and-inference"></a>
