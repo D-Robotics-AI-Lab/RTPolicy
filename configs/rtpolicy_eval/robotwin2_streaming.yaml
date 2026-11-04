@@ -1,0 +1,24 @@
+# Opt-in streaming; the original environment/evaluator/policy adapter are reused.
+policy_name: rtpolicy.deployment.robotwin_streaming
+task_name: lift_pot
+task_config: agilex_config
+ckpt_setting: null
+checkpoint_num: null
+expert_data_num: 50
+test_num: 100
+num_process: 1
+seed: 0
+instruction_type: unseen
+head_camera_type: D435
+
+backend: pytorch
+model_path: null
+metadata_path: null
+num_inference_timesteps: 4
+
+streaming:
+  timebase: control_steps
+  inference_hz: 10.0
+  control_hz: 30.0
+  switch_margin_s: 0.03
+  trajectory_dt: 0.02

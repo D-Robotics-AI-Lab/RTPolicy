@@ -27,3 +27,6 @@ onnxruntime-gpu==1.22.0
 
 # Public Google Drive checkpoint downloads.
 gdown>=5.2,<6
+
+# Streaming trajectory stitching (loaded only by the opt-in inference adapter).
+osqp>=1.0.4,<2
