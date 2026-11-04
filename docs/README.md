@@ -1,4 +1,4 @@
-# Training Guide
+# Training and Inference Guide
 
 RTPolicy trains directly on LeRobot datasets by default. Lance is optional.
 Run commands from the repository root.
@@ -108,3 +108,89 @@ the same configuration and output directory and append
 `resume_from_checkpoint=latest` to the training command.
 
 For agent-managed setup and checkpoint export, see the [AI Setup Guide](AI_SETUP.md).
+
+## Streaming inference
+
+The deployment pipeline separates camera acquisition, policy prediction,
+trajectory stitching and robot control. Prediction consumes the latest complete
+observation window at 10 Hz while execution continues along the active reference.
+Each predicted chunk is timestamped with its observation capture time, with
+waypoints spaced at 1/30 s. The low-level robot controller samples the continuous
+reference at its own servo frequency.
+
+1. **Observe.** Keep timestamped RGB and joint-state observations. History lengths
+   come from the checkpoint; the released lift_pot policy uses three states and
+   the latest image from each camera.
+2. **Predict.** One inference worker reads a snapshot of the newest window.
+   It never queues old windows or runs concurrent model forwards.
+3. **Stitch.** Discard the elapsed chunk prefix and choose a switch time 30 ms
+   ahead. A piecewise-constant-jerk QP tracks the remaining targets, penalizes
+   normalized acceleration and jerk, and bounds velocity, acceleration and jerk.
+   Its initial position, velocity and acceleration match the active reference at
+   the switch, preserving C2 continuity when the trajectories overlap. Arm and
+   gripper channels use separate limits. The old prefix remains active until
+   the switch; expired updates are discarded. A failed optimization keeps the
+   active reference, and the runner holds measured joints if no reference is valid.
+4. **Execute.** Sample the stitched reference while the next prediction runs.
+   Episode reset drains the worker and clears observation and trajectory history.
+
+[`StreamingPolicyRunner`](../rtpolicy/deployment/streaming.py) wraps the existing
+PyTorch, ONNX or TensorRT runner. For a real-robot integration, use monotonic
+capture timestamps from the same clock as the runner. Feed encoded observations
+through `update_obs(observation, timestamp=capture_time)` and call `get_action()`
+to start and drive streaming. An independently scheduled servo can sample
+`get_reference()` for joint position, velocity and acceleration. The application
+retains responsibility for its robot transport and controller lifecycle.
+
+### RoboTwin2 example
+
+Set `ckpt_setting` to the checkpoint directory in
+[`robotwin2_streaming.yaml`](../configs/rtpolicy_eval/robotwin2_streaming.yaml).
+The default example uses lift_pot, NFE4, seed0, 100 episodes and one worker.
+Use the same task settings and checkpoint when comparing with blocking inference.
+
+```bash
+python scripts/eval/run_robotwin2.py \
+  --config configs/rtpolicy_eval/robotwin2_streaming.yaml \
+  --runtime-dir /path/to/external/streaming-evaluation
+```
+
+Only the policy namespace changes to `rtpolicy.deployment.robotwin_streaming`.
+The adapter delegates to the existing RoboTwin2 policy hook and emits one joint
+target per call. Observation encoding, JPEG alignment, `take_action`, expert
+preflight, seed selection and task success checks are reused unchanged.
+
+RoboTwin2 executes a complete, variable-duration TOPP segment per `take_action`.
+The default `timebase: control_steps` therefore advances the policy trajectory
+by 1/30 s after each executed action, instead of aging it while simulation is
+paused. Prediction is scheduled at up to 10 Hz in wall time and command delivery
+at up to 30 Hz. This is a simulation adapter for the streaming design; the
+real-robot interface uses continuous wall time and an independent servo loop.
+The QP knot interval is 20 ms in both interfaces.
+
+At each completed episode the adapter prints `[RTPolicy streaming]` JSON with
+prediction, accepted/stale update and hold counts, plus inference and stitching
+latencies. The original evaluator writes the task success results under the
+external runtime directory.
+
+### Single-task validation
+
+One streaming run used the released lift_pot checkpoint, PyTorch BF16, NFE4,
+seed0, JPEG q95 alignment, agilex_config, 100 episodes and one evaluator worker
+on NVIDIA L4. The original checkpoint files and RoboTwin2 source were unchanged.
+
+| Inference mode | lift_pot successes |
+| --- | ---: |
+| Blocking PyTorch BF16, previously measured | 93/100 |
+| Streaming PyTorch BF16, one new run | 94/100 |
+
+The original expert preflight and seed scan selected the scenes; the two runs
+share 99 accepted seeds. Wall-time scheduling can affect asynchronous rollouts.
+These single-task checks are separate from the paper's 50-task benchmark.
+The L4 simulation run averaged about three policy commands per second with
+the original TOPP execution and rendering; its reference grid remains 30 Hz.
+
+The run completed with no inference-thread exceptions. It recorded 9,788
+asynchronous predictions and 123 rejected trajectory optimizations, which
+retained the active reference. The tested inference implementation is
+[`91c7e0b`](https://github.com/D-Robotics-AI-Lab/RTPolicy/commit/91c7e0baa95753be3db45916a29b22baad05cac6).

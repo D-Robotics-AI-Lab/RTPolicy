@@ -81,6 +81,7 @@ cross-view information in a small representation for the action model.
 | [`rtpolicy/models/policy/rtpolicy/`](rtpolicy/models/policy/rtpolicy/) | Visual encoder, multi-view fusion, adapters, DiT, and policy runner |
 | [`rtpolicy/datasets/`](rtpolicy/datasets/)                             | Dataset readers and preprocessing interfaces                        |
 | [`rtpolicy/trainer/`](rtpolicy/trainer/)                               | Training and ONNX export                                            |
+| [`rtpolicy/deployment/`](rtpolicy/deployment/)                       | Backend adapters and asynchronous streaming with trajectory stitching |
 | [`configs/`](configs/)                                                 | Training, observation, robot, and ONNX export configurations        |
 | [`simulation/robotwin2.0/`](simulation/robotwin2.0/)                   | RoboTwin2.0 environments and RTPolicy adapter                       |
 | [`scripts/`](scripts/) · [`tools/`](tools/)                            | Evaluation, inference, TensorRT tools, and dataset preparation      |
@@ -302,6 +303,27 @@ backend: tensorrt
 model_path: /path/to/artifacts/model-fp16.engine
 metadata_path: /path/to/artifacts/model.onnx.metadata.json
 ```
+
+### 4.5 Streaming Inference
+
+Streaming runs prediction alongside action execution. The deployment design
+targets **10 Hz** inference on the latest observation window, with a **30 Hz**
+action-waypoint grid and piecewise-jerk optimization to join successive chunks.
+
+Set `ckpt_setting` in the [streaming example](configs/rtpolicy_eval/robotwin2_streaming.yaml), then run:
+
+```bash
+python scripts/eval/run_robotwin2.py \
+  --config configs/rtpolicy_eval/robotwin2_streaming.yaml \
+  --runtime-dir /path/to/external/streaming-evaluation
+```
+
+The opt-in adapter reuses RoboTwin2's existing observation encoding, action
+execution and evaluator. [Streaming guide](docs/README.md#streaming-inference)
+explains the real-robot pipeline, trajectory stitching and simulation timebase.
+
+A single 100-episode check reached **94/100 on lift_pot** with PyTorch BF16,
+NFE4, seed0 and JPEG input alignment. The guide records the protocol and comparison.
 
 <a id="acknowledgements"></a>
 
